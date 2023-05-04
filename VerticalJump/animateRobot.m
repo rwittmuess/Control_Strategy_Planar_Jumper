@@ -25,12 +25,12 @@ function drawRobot(q)
 
     pKnee = pKnee_gen(q);
     pHip = pHip_gen(q);
-    % pHead = pHead_gen(q);
+    pHead = pHead_gen(q);
     pCOM = pCOM_gen(q);
-    % l1 = line([xF;pKnee(1)], [zF;pKnee(2)], 'Color', 'k', 'LineWidth', 2);
+    l1 = line([xF;pKnee(1)], [zF;pKnee(2)], 'Color', 'k', 'LineWidth', 2);
     hold on
-    % l2 = line([pKnee(1);pHip(1)], [pKnee(2);pHip(2)], 'Color', 'k', 'LineWidth', 2);
-    % l3 = line([pHip(1);pHead(1)], [pHip(2);pHead(2)], 'Color', 'k', 'LineWidth', 2);
+    l2 = line([pKnee(1);pHip(1)], [pKnee(2);pHip(2)], 'Color', 'k', 'LineWidth', 2);
+    l3 = line([pHip(1);pHead(1)], [pHip(2);pHead(2)], 'Color', 'k', 'LineWidth', 2);
     plot(pKnee(1), pKnee(2), 'bo', 'MarkerSize',7,'MarkerEdgeColor','b','MarkerFaceColor','g')
     plot(pHip(1), pHip(2), 'ro', 'MarkerSize',7,'MarkerEdgeColor','r','MarkerFaceColor','g')
     plot(xF, zF, 'ko', 'MarkerSize',7,'MarkerEdgeColor','k','MarkerFaceColor','g')

@@ -1,21 +1,18 @@
-function ds = robot_dynamics(t,s)
-    
+function ds = robot_dynamics_flight(t,s,LOv)
 
-    %% Setting constants
-    
-    % persistent lambda1 lambda2 lambda3 M1 M2 M3
+    % persistent lambda1 lambda2 M1 M2 td_LO
 
-    % in s, each variable is a row
+    % controller for lref_F
+    % compute reference with kinematics of zCOM not from state s
     % gains for sliding surface
-    lambda1 = 50;
-    lambda2 = 20;
-    lambda3 = 20;
+    lambda1 = 20;
+    lambda2 = 10;
 
     % control parameter
-    M1 = 500;
-    M2 = 400;
-    M3 = 400; 
+    M1 = 100;%300
+    M2 = 100;
 
+    td_LO = 1; % time of lift-off; later take actually lift-off time, if I can manage to make lift off event depended on acceleraion for instance
 
     %% D
     % D = D_gen(s);  
@@ -154,16 +151,30 @@ function ds = robot_dynamics(t,s)
     t2 = q2+q3;
     t3 = sin(t2);
     dl = sqrt(2.0).*(dq2.*t3.*2.959e+3+dq3.*t3.*2.959e+3+dq2.*sin(q2).*4.304e+3+dq3.*sin(q3).*2.64e+3).*1.0./sqrt(cos(q2).*6.456e+4+cos(q3).*3.96e+4+cos(t2).*4.4385e+4+7.8593e+4).*(-1.0./1.25e+2);
-    %% lref_LO
-    % lref_LO = lref_LO_gen(t);
-    lref_LO = t.*(-1.17e+2./1.0e+2)+tanh(t.*(9.0./5.0)-9.0./5.0).*(1.58e+2./2.5e+1)-t.^2.*(9.81e+2./2.0e+2)+6.67e+2./1.0e+2;
-    %% dlref_LO
-    % dlref_LO = dlref_LO_gen(t);
-    dlref_LO = t.*(-9.81e+2./1.0e+2)-tanh(t.*(9.0./5.0)-9.0./5.0).^2.*1.1376e+1+1.0206e+1;
+    %% lref_F
+    % lref_F = lref_F_gen([t;td_LO;LOv]);
+    dl_LO = LOv(2);
+    l_LO = LOv(1);
+    tLO = td_LO;
+    ts = t;
+    t2 = -ts;
+    t3 = t2+tLO;
+    lref_F = l_LO-dl_LO.*t3-1.0./cosh(tLO.*2.5e+1-ts.*2.5e+1+1.5e+1./8.0).^2.*(1.3e+1./1.0e+2)-t3.^2.*(9.81e+2./2.0e+2)+1.0./1.0e+2;
+    %% dlref_F
+    % dlref_F = dlref_F_gen([t;td_LO;LOv]);
+    dl_LO = LOv(2);
+    tLO = td_LO;
+    ts = t;
+    t2 = tLO.*2.5e+1;
+    t3 = ts.*2.5e+1;
+    t4 = -t3;
+    t5 = t2+t4+1.5e+1./8.0;
+    dlref_F = dl_LO+tLO.*(9.81e+2./1.0e+2)-ts.*(9.81e+2./1.0e+2)-1.0./cosh(t5).^3.*sinh(t5).*(1.3e+1./2.0);
     %% lt
-    lt = l - lref_LO;
+    lt = l - lref_F;
     %% dlt
-    dlt = dl - dlref_LO;
+    dlt = dl - dlref_F;
+    %%
     %% theta
     % theta = theta_gen(s(1:5));
     q1 = s(1);
@@ -184,38 +195,27 @@ function ds = robot_dynamics(t,s)
     t4 = q2+q3;
     t5 = cos(t4);
     dtheta = (dq1.*1.57186e+5+dq2.*8.4825e+4+dq3.*2.7225e+4+dq1.*t2.*1.2912e+5+dq1.*t3.*7.92e+4+dq2.*t2.*6.456e+4+dq2.*t3.*7.92e+4+dq1.*t5.*8.877e+4+dq3.*t3.*3.96e+4+dq2.*t5.*4.4385e+4+dq3.*t5.*4.4385e+4)./(t2.*1.2912e+5+t3.*7.92e+4+t5.*8.877e+4+1.57186e+5);
-    %% theta3
-    % theta3 = theta3_gen(s(1:5));
-    q1 = s(1);
-    q2 = s(2);
-    q3 = s(3);
-    theta3 = q1+q2+q3;
-    %% dtheta3
-    % dtheta3 = dtheta3_gen(s);
-    dq1 = s(6);
-    dq2 = s(7);
-    dq3 = s(8);
-    dtheta3 = dq1+dq2+dq3;
+    %% vertical trunk is discarded (theta3 = 0 && dtheta3 = 0)
 
     %% Calculating
+
+    % Phi = Jy/D(1:3,1:3);
+    % D33_inv = D(1:3,1:3)\eye(3);
+    % Phi = Jy*D33_inv;
     D33_inv = D(1:3,1:3)\eye(3);
     D_inv = D\eye(5);
     Phi = Jy*D33_inv;
-    %Phi = Jy/D(1:3,1:3);
+    
+    sigma = [dlt + lambda1*lt;... % "-" tried
+             dtheta + lambda2*theta];
+    
+    tau = -Phi(1:2,2:3)\(sign(sigma).*[M1;M2]);
 
-    sigma = [dlt + lambda1*lt;...
-             dtheta + lambda2*theta;...
-             dtheta3 + lambda3*theta3];
+    F = [0;tau;0;0]; %F0 = [0;0]
 
-    tau = -Phi\(sign(sigma).*[M1;M2;M3]);
-
-    F0 = Cq(4:5) + G(4:5) + D(4:5,1:3) * (D33_inv*(tau - Cq(1:3) - G(1:3)));
-
-    F = [tau;F0];
-   
     % ds = zeros(10,1);
-    % ds(1:5) = s(6:10);
-    % ds(6:10) = D\(F-Cq-G);
+    % ds(1:5,1) = s(6:10);
+    % ds(6:10,1) = D\(F-Cq-G);
     ds = [s(6:10);D_inv*(F-Cq-G)];
-   
+
 end

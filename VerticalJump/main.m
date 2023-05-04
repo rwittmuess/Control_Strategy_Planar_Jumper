@@ -7,42 +7,58 @@
 
 
 %% For a fresh start:
-clc; clear all; close all;
+clc; clear; close all;
 dynamics;
 
+%% Settings for increasing computational speed
+
+reltol_start    = 1e-2;
+abstol_start    = 1e-3;
+tspan_start     = [0:0.01:1];   % tspan_start = [0 1];
+
+reltol_flight   = 1e-3;
+abstol_flight   = 1e-3;
+% tspan_flight    = [0:0.01:1];   % tspan_start = [0 1];
+
+
 %% Solve ODE for robot dynamics
+
+%s0 = [0;-pi/4;pi/2;0;0;...
+      % 0;0;0;0;0];
 s0 = [0;-pi/4;pi/2;0;0;...
       0;0;0;0;0];
 
-Opt = odeset('Events', @robotics_event,'RelTol',1e-3,'AbsTol',1e-6);
-[t,s] = ode45(@(t,s) robot_dynamics(t,s), 0:0.01:1.1 , s0, Opt);
+Opt = odeset('Events', @robotics_event,'RelTol',reltol_start,'AbsTol',abstol_start);
+[t,s] = ode45(@(t,s) robot_dynamics(t,s), tspan_start, s0, Opt);
 
 tData = t(1:end-1);
 sData = s(1:end-1,:);
 
-%%
-tDataLO = tData;
-sDataLO = sData;
-
 %% after running once: just run from here
-tData = tDataLO;
-sData = sDataLO;
 % s0 = [0.643551279512161, -1.38116878810655, 0.737613340437614, -4.36564827749447e-15, 2.25977590679604e-14, -1.04637683867421, 2.32542793026359, -1.28181713291239, -6.02979306700862e-15, 3.01614185027691e-14];
+
 s0 = sData(end,:);
 
-
-% Opt = odeset('Events', @robotics_flight_event);
-Opt = odeset('Events', @robotics_flight_event,'RelTol',1e-3,'AbsTol',1e-6);
-
-% Opt = odeset('RelTol',1e-12);
 LOv = [l_gen(sData(end,1:5)');dl_gen(sData(end,:)')];
-% I think I know one of the problems: lref_F wird ausgerechnet mit t1s,
-% wobei das eingesetzte t t= 1s und mehr ist, die ode setzt aber t=0 ein...
-[t,s] = ode45(@(t,s) robot_dynamics_flightV3(t,s,LOv), tData(end):0.001:tData(end)+10, s0, Opt); %[0:0.005:0.15]
+
+Opt = odeset('Events', @robotics_flight_event,'RelTol',reltol_flight,'AbsTol',abstol_flight);
+% [t,s] = ode45(@(t,s) robot_dynamics_flight(t,s,LOv), tData(end):0.001:tData(end)+10, s0, Opt); %[0:0.005:0.15]
+[t,s] = ode45(@(t,s) robot_dynamics_flight(t,s,LOv), tData(end):0.01:tData(end)+3, s0, Opt); %[0:0.005:0.15]
+
 
 % tData = [tData;tData(end)+t(2:end)];
 tData = [tData;t(2:end)];
 sData = [sData;s(2:end,:)];
+
+%% prepare next jump
+s0 = sData(end,:);
+
+Opt = odeset('Events', @robotics_event,'RelTol',reltol_start,'AbsTol',abstol_start);
+[t,s] = ode45(@(t,s) robot_dynamics(t,s), tData(end):0.01:tData(end)+3, s0, Opt);
+
+tData = [tData;t(2:end)];
+sData = [sData;s(2:end,:)];
+
 
 %%
 % t = 0;
@@ -58,7 +74,6 @@ l = l_gen(qData')';
 % t1s_val = [tData';ones(length(tData)*1)];
 % lref_F = lref_F_gen(t1s_val,sData);
 % lref_F = [zeros(1,101),lref_F]';
-
 % zFref = zFref_gen(t1s_val);
 
 %%
