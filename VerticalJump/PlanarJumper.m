@@ -10,25 +10,26 @@ function PlanarJumper
 % clc; clear; close all;
 % dynamics;
 
+
 %% activate Profiler
 % profile on
 % Run code to profile
 
 
-
 %% Settings for increasing computational speed
-reltol_start    = 1e-2;
-abstol_start    = 1e-3;
+reltol_start    = 1e-3;
+abstol_start    = 1e-6;
 tspan_start     = [0:0.01:1];   % tspan_start = [0 1];
 
-reltol_flight   = 1e-2;
-abstol_flight   = 1e-3;
+reltol_flight   = 1e-3;
+abstol_flight   = 1e-6;
 % tspan_flight    = [0:0.01:1];   % tspan_start = [0 1];
 
 
-%% Starting & getting reeady to jump: Solve ODE for robot dynamics
+%% GROUND PHASE
 %s0 = [0;-pi/4;pi/2;0;0;...
       % 0;0;0;0;0];
+
 s0 = [0;-pi/4;pi/2;0;0;...
       0;0;0;0;0];
 
@@ -38,26 +39,34 @@ Opt = odeset('Events', @robotics_event,'RelTol',reltol_start,'AbsTol',abstol_sta
 tData = t(1:end-1);
 sData = s(1:end-1,:);
 
-%% after running once: just run from here
+
+%% FLIGHT PHASE
 % s0 = [0.643551279512161, -1.38116878810655, 0.737613340437614, -4.36564827749447e-15, 2.25977590679604e-14, -1.04637683867421, 2.32542793026359, -1.28181713291239, -6.02979306700862e-15, 3.01614185027691e-14];
 
 s0 = sData(end,:);
 
-LOv = [l_gen(sData(end,1:5)');dl_gen(sData(end,:)')];
+LOv = [ (sData(end,1:5)');dl_gen(sData(end,:)')];
 
 Opt = odeset('Events', @robotics_flight_event,'RelTol',reltol_flight,'AbsTol',abstol_flight);
 % [t,s] = ode45(@(t,s) robot_dynamics_flight(t,s,LOv), tData(end):0.001:tData(end)+10, s0, Opt); %[0:0.005:0.15]
 [t,s] = ode45(@(t,s) robot_dynamics_flight(t,s,LOv), tData(end):0.01:tData(end)+5, s0, Opt); %[0:0.005:0.15]
 
-
 % tData = [tData;tData(end)+t(2:end)];
 tData = [tData;t(2:end)];
 sData = [sData;s(2:end,:)];
 
-%% deactivate Profiler
-% Path where you want to store the HTML profiler results
-% html_folder = './Profiler';
-% profsave(profile('info'), html_folder)
+
+%% LANDING PHASE
+tData = tDataF;
+sData = sDataF;
+
+t_LI = tData(end);
+% Opt = odeset('Events', @robotics_landing_event);
+Opt = odeset('RelTol',1e-3);
+[t,s] = ode45(@(t,s,t_LI) robot_dynamics_landing(t,s,t_LI), [tData(end):0.01:tData(end)+3], s0, Opt, t_LI); %[0:0.005:0.15]
+
+tData = [tData;t(2:end)];
+sData = [sData;s(2:end,:)];
 
 
 %% prepare next jump
@@ -70,12 +79,18 @@ sData = [sData;s(2:end,:)];
 % sData = [sData;s(2:end,:)];
 
 
+%% deactivate Profiler
+% Path where you want to store the HTML profiler results
+% html_folder = './Profiler';
+% profsave(profile('info'), html_folder)
+
+
 %%
 % t = 0;
 % q = [0,-pi/4,pi/2,0,0];
 
-qData = sData(:,1:5);
-animateRobot(tData,qData)
+% qData = sData(:,1:5);
+% animateRobot(tData,qData)
 
 %%
 % lref_LO = lref_LO_gen(tData);

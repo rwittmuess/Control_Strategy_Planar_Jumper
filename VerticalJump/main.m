@@ -14,9 +14,9 @@ dynamics;
 
 reltol_start    = 1e-2;
 abstol_start    = 1e-3;
-tspan_start     = [0:0.01:1];   % tspan_start = [0 1];
+tspan_start     = 0:0.01:1;   % tspan_start = [0 1];
 
-reltol_flight   = 1e-3;
+reltol_flight   = 1e-2;
 abstol_flight   = 1e-3;
 % tspan_flight    = [0:0.01:1];   % tspan_start = [0 1];
 
