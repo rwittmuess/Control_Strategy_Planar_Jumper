@@ -1,20 +1,23 @@
-function ds = robot_dynamics_landing(t,s)
+function ds = robot_dynamics_landing(t,s,t_LI)
+    
+
+    %% Setting constants
+
     % in s, each variable is a row
     % gains for sliding surface
-    lambda1 = 20;
+    lambda1 = 50;
     lambda2 = 20;
     lambda3 = 20;
-%     print(s)
 
     % control parameter
-    M1 = 300;
-    M2 = 300;
-    M3 = 300;
+    M1 = 500;
+    M2 = 400;
+    M3 = 400; 
 
     sz = size(s);
     ds = zeros(10,sz(2));
    
-
+    %% Import functions
     D = D_gen(s);
     Cq = Cq_gen(s);
     G = G_gen(s);
@@ -25,10 +28,10 @@ function ds = robot_dynamics_landing(t,s)
     
     l = l_gen(s(1:5));
     dl = dl_gen(s);
-    lref_LO = lref_LO_gen(t);
-    dlref_LO = dlref_LO_gen(t);
-    lt = l - lref_LO;
-    dlt = dl - dlref_LO;
+    lref_LI = lref_LI_gen([t;t_LI]);
+    dlref_LI = dlref_LI_gen([t;t_LI]);
+    lt = l - lref_LI;
+    dlt = dl - dlref_LI;
 
     theta = theta_gen(s(1:5));
     dtheta = dtheta_gen(s);

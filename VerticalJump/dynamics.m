@@ -172,16 +172,16 @@ k22 = 25;
 k23 = 0.01;
 
 % parameter landing trajectory
-k31 = 0.1;
+k31 = 0.169241108569274; %0.1;
 k32 = 2;
-k33 = 0.58;
+k33 = -0.686209256691246; %0.58;
 
 % desired parameters
 td_LO = 1; % time of lift-off
 zd_Fmax = 0.12; % max foot hight in ther air
 dld_LO = 0.4; % speed of CoM at lift-off
 tz_Fmax = 0.075; % time after which max foot hight is reached
-tl_min = 0.2; % something for landing instance
+tl_min = 0.2; % something for landing instance, I think the time after which l / hence COM will have its lowest value
 
 % reference during stance phase of the CoM
 lref_LO = simplify(k11 * tanh(k12 * (ts - td_LO)) - 0.5*g*ts^2 + k13*ts + k14);

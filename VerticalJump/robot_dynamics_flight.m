@@ -442,21 +442,21 @@ function ds = robot_dynamics_flight(t,s,LOv)
     % Phi = Jy/D(1:3,1:3);
     % D33_inv = D(1:3,1:3)\eye(3);
     % Phi = Jy*D33_inv;
-    D33_inv = D(1:3,1:3)\eye(3);
-    D_inv = D\eye(5);
-    Phi = Jy*D33_inv;
-    Phi_inv = Phi(1:2,2:3)\eye(2);
+    % D33_inv = D(1:3,1:3)\eye(3);
+    % D_inv = D\eye(5);
+    Phi = Jy/D(1:3,1:3);
+    % Phi_inv = Phi(1:2,2:3)\eye(2);
 
     sigma = [dlt + lambda1*lt;... % "-" tried
              dtheta + lambda2*theta];
     
-    tau = -Phi_inv*(sign(sigma).*[M1;M2]);
+    tau = -Phi(1:2,2:3)\(sign(sigma).*[M1;M2]);
 
     F = [0;tau;0;0]; %F0 = [0;0]
 
     % ds = zeros(10,1);
     % ds(1:5,1) = s(6:10);
     % ds(6:10,1) = D\(F-Cq-G);
-    ds = [s(6:10);D_inv*(F-Cq-G)];
+    ds = [s(6:10);D\(F-Cq-G)];
 
 end

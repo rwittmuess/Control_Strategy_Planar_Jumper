@@ -17,14 +17,16 @@ function PlanarJumper
 
 
 %% Settings for increasing computational speed
-reltol_start    = 1e-3;
-abstol_start    = 1e-6;
-tspan_start     = [0:0.01:1];   % tspan_start = [0 1];
+reltol_start    = 1e-2;
+abstol_start    = 1e-3;
+tspan_start     = 0:0.01:1;   % tspan_start = [0 1];
 
-reltol_flight   = 1e-3;
-abstol_flight   = 1e-6;
+reltol_flight   = 1e-2;
+abstol_flight   = 1e-3;
 % tspan_flight    = [0:0.01:1];   % tspan_start = [0 1];
 
+reltol_landing = 1e-2;
+abstol_landing = 1e-3;
 
 %% GROUND PHASE
 %s0 = [0;-pi/4;pi/2;0;0;...
@@ -38,6 +40,8 @@ Opt = odeset('Events', @robotics_event,'RelTol',reltol_start,'AbsTol',abstol_sta
 
 tData = t(1:end-1);
 sData = s(1:end-1,:);
+tData_GroundPhase = t;
+sData_GroundPhase = s;
 
 
 %% FLIGHT PHASE
@@ -45,7 +49,7 @@ sData = s(1:end-1,:);
 
 s0 = sData(end,:);
 
-LOv = [ (sData(end,1:5)');dl_gen(sData(end,:)')];
+LOv = [l_gen(sData(end,1:5)');dl_gen(sData(end,:)')];
 
 Opt = odeset('Events', @robotics_flight_event,'RelTol',reltol_flight,'AbsTol',abstol_flight);
 % [t,s] = ode45(@(t,s) robot_dynamics_flight(t,s,LOv), tData(end):0.001:tData(end)+10, s0, Opt); %[0:0.005:0.15]
@@ -54,20 +58,34 @@ Opt = odeset('Events', @robotics_flight_event,'RelTol',reltol_flight,'AbsTol',ab
 % tData = [tData;tData(end)+t(2:end)];
 tData = [tData;t(2:end)];
 sData = [sData;s(2:end,:)];
+tData_FlightPhase = t;
+sData_FlightPhase = s;
 
-
-%% LANDING PHASE
-tData = tDataF;
-sData = sDataF;
-
-t_LI = tData(end);
-% Opt = odeset('Events', @robotics_landing_event);
-Opt = odeset('RelTol',1e-3);
-[t,s] = ode45(@(t,s,t_LI) robot_dynamics_landing(t,s,t_LI), [tData(end):0.01:tData(end)+3], s0, Opt, t_LI); %[0:0.005:0.15]
-
-tData = [tData;t(2:end)];
-sData = [sData;s(2:end,:)];
-
+% %% LANDING PHASE
+% 
+% % t_LI = tData(end);
+% % % Opt = odeset('RelTol',1e-3);
+% % Opt = odeset('RelTol',reltol_landing,'AbsTol',abstol_landing); %'Events', @robotics_landing_event,
+% % [t,s] = ode45(@(t,s,t_LI) robot_dynamics_landing(t,s,t_LI), tData(end):0.01:tData(end)+3, s0, Opt, t_LI); %[0:0.005:0.15]
+% % 
+% % tData = [tData;t(2:end)];
+% % sData = [sData;s(2:end,:)];
+% 
+% 
+% % s0 = sData(end,:);
+% s0 = [0.6437   -1.3817    0.7380   -0.0000   -0.0000   -1.2026    2.5749   -1.4090   -0.0000   -0.0000];
+% disp(s0)
+% t_LI = tData(end);
+% 
+% Opt = odeset('RelTol',reltol_landing); %, 'AbsTol',abstol_landing
+% % Opt = odeset('Events', @(t,s)robotics_landing_event(t,s,t_LI),'RelTol',reltol_start,'AbsTol',abstol_start);
+% [t,s] = ode45(@(t,s) robot_dynamics_landing(t,s,t_LI), tData(end):0.01:tData(end-1)+5, s0, Opt);
+% 
+% tData = [tData;t(2:end)];
+% sData = [sData;s(2:end,:)];
+% 
+% 
+% % [t,s] = ode45(@(t,s,t_LI) robot_dynamics_landing(t,s,t_LI), [tData(end):0.01:tData(end)+3], s0, Opt, t_LI); %[0:0.005:0.15]
 
 %% prepare next jump
 % s0 = sData(end,:);
@@ -89,8 +107,9 @@ sData = [sData;s(2:end,:)];
 % t = 0;
 % q = [0,-pi/4,pi/2,0,0];
 
-% qData = sData(:,1:5);
-% animateRobot(tData,qData)
+qData = sData(:,1:5);
+animateRobot(tData,qData)
+
 
 %%
 % lref_LO = lref_LO_gen(tData);
