@@ -56,6 +56,7 @@ xCOM = (p1(1)*m1 + p2(1)*m2 + p3(1)*m3)/(m1+m2+m3);
 zCOM = (p1(2)*m1 + p2(2)*m2 + p3(2)*m3)/(m1+m2+m3);
 pCOM = [xCOM;zCOM];
 
+dxCOM = simplify(jacobian(xCOM,q)*dq);
 dzCOM = simplify(jacobian(zCOM,q)*dq);
 
 if ~exist('./gen')
@@ -67,6 +68,7 @@ matlabFunction(pKnee, 'File', 'gen/pKnee_gen', 'Vars', {q});
 matlabFunction(pHip,  'File', 'gen/pHip_gen',  'Vars', {q});
 matlabFunction(pHead, 'File', 'gen/pHead_gen', 'Vars', {q});
 matlabFunction(pCOM,  'File', 'gen/pCOM_gen',  'Vars', {q});
+matlabFunction(dxCOM, 'File', 'gen/dxCOM_gen', 'Vars', {s});
 matlabFunction(dzCOM, 'File', 'gen/dzCOM_gen', 'Vars', {s});
 
 dp1 = simplify(jacobian(p1, q)*dq);

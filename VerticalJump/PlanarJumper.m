@@ -1,9 +1,11 @@
 function PlanarJumper
 %% Legged Robots - Final Project
-% To-Do:
-% make event function dependend on l'' < -g for lift-off
-% plot desired path and actual path to make sure robot follows desired path
-% change robotics_flight to reduced controler!!!
+%{
+    ToDo:
+    * make event function dependend on l'' < -g for lift-off
+    * plot desired path and actual path to make sure robot follows desired path
+    * change robotics_flight to reduced controler!!!
+%}
 
 
 %% For a fresh start:
@@ -61,7 +63,7 @@ sData = [sData;s(2:end,:)];
 tData_FlightPhase = t;
 sData_FlightPhase = s;
 
-% %% LANDING PHASE
+%% LANDING PHASE
 % 
 % % t_LI = tData(end);
 % % % Opt = odeset('RelTol',1e-3);
