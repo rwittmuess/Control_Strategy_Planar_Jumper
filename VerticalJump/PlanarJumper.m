@@ -9,7 +9,7 @@ function PlanarJumper
 
 
 %% For a fresh start:
-% clc; clear; close all;
+clc; clear; close all;
 % dynamics;
 
 
@@ -21,7 +21,7 @@ function PlanarJumper
 %% Settings for increasing computational speed
 reltol_start    = 1e-2;
 abstol_start    = 1e-3;
-tspan_start     = 0:0.01:1;   % tspan_start = [0 1];
+tspan_start     = 0:0.01:3;   % tspan_start = [0 1];
 
 reltol_flight   = 1e-2;
 abstol_flight   = 1e-3;
@@ -45,23 +45,28 @@ sData = s(1:end-1,:);
 tData_GroundPhase = t;
 sData_GroundPhase = s;
 
+disp(t(end))
+
+qData = sData(:,1:5);
+animateRobot(tData,qData)
+
 
 %% FLIGHT PHASE
-% s0 = [0.643551279512161, -1.38116878810655, 0.737613340437614, -4.36564827749447e-15, 2.25977590679604e-14, -1.04637683867421, 2.32542793026359, -1.28181713291239, -6.02979306700862e-15, 3.01614185027691e-14];
-
-s0 = sData(end,:);
-
-LOv = [l_gen(sData(end,1:5)');dl_gen(sData(end,:)')];
-
-Opt = odeset('Events', @robotics_flight_event,'RelTol',reltol_flight,'AbsTol',abstol_flight);
-% [t,s] = ode45(@(t,s) robot_dynamics_flight(t,s,LOv), tData(end):0.001:tData(end)+10, s0, Opt); %[0:0.005:0.15]
-[t,s] = ode45(@(t,s) robot_dynamics_flight(t,s,LOv), tData(end):0.01:tData(end)+5, s0, Opt); %[0:0.005:0.15]
-
-% tData = [tData;tData(end)+t(2:end)];
-tData = [tData;t(2:end)];
-sData = [sData;s(2:end,:)];
-tData_FlightPhase = t;
-sData_FlightPhase = s;
+% % s0 = [0.643551279512161, -1.38116878810655, 0.737613340437614, -4.36564827749447e-15, 2.25977590679604e-14, -1.04637683867421, 2.32542793026359, -1.28181713291239, -6.02979306700862e-15, 3.01614185027691e-14];
+% 
+% s0 = sData(end,:);
+% 
+% LOv = [l_gen(sData(end,1:5)');dl_gen(sData(end,:)')];
+% 
+% Opt = odeset('Events', @robotics_flight_event,'RelTol',reltol_flight,'AbsTol',abstol_flight);
+% % [t,s] = ode45(@(t,s) robot_dynamics_flight(t,s,LOv), tData(end):0.001:tData(end)+10, s0, Opt); %[0:0.005:0.15]
+% [t,s] = ode45(@(t,s) robot_dynamics_flight(t,s,LOv), tData(end):0.01:tData(end)+5, s0, Opt); %[0:0.005:0.15]
+% 
+% % tData = [tData;tData(end)+t(2:end)];
+% tData = [tData;t(2:end)];
+% sData = [sData;s(2:end,:)];
+% tData_FlightPhase = t;
+% sData_FlightPhase = s;
 
 %% LANDING PHASE
 % 
@@ -109,8 +114,8 @@ sData_FlightPhase = s;
 % t = 0;
 % q = [0,-pi/4,pi/2,0,0];
 
-qData = sData(:,1:5);
-animateRobot(tData,qData)
+% qData = sData(:,1:5);
+% animateRobot(tData,qData)
 
 
 %%
