@@ -1,38 +1,38 @@
-% % function [value, isterminal, direction] = robotics_event(t,~)
-% %     td_LO = 1;
-% %     value      = t - td_LO;
-% %     isterminal = 1;  % Stop the integration
-% %     direction  = +1; % (+1: detect zeros where the event funtion is increasing)
-% % end
-function [value, isterminal, direction] = robotics_event(t,s)
-    
-    persistent dl_prev % Declare ddl_prev as a persistent variable
-
-    if isempty(dl_prev) % For the first integration step, use ddl = 0
-        dl = dl_gen(s);
-        ddl = 0;
-    else
-        dl = dl_gen(s);
-        ddl = (dl-dl_prev)/0.01;
-    end
-    dl_prev = dl;
-    
-
-    if t-0.7<0
-        value = (t-1);
-    else
-        disp(ddl)
-        disp('??????????????????????????????????')
-        value = (t-1)+(-ddl+9.81)-15; % SOMETHING WRONG HERE
-        % ddl is making problems
-    end
-
-
+function [value, isterminal, direction] = robotics_event(t,~)
+    td_LO = 1;
+    value      = t - td_LO;
     isterminal = 1;  % Stop the integration
     direction  = +1; % (+1: detect zeros where the event funtion is increasing)
-
-    % disp(['value: ', num2str(value), ' | t: ', num2str(t)])
 end
+% function [value, isterminal, direction] = robotics_event(t,s)
+% 
+%     persistent dl_prev % Declare ddl_prev as a persistent variable
+% 
+%     if isempty(dl_prev) % For the first integration step, use ddl = 0
+%         dl = dl_gen(s);
+%         ddl = 0;
+%     else
+%         dl = dl_gen(s);
+%         ddl = (dl-dl_prev)/0.01;
+%     end
+%     dl_prev = dl;
+% 
+% 
+%     if t-0.7<0
+%         value = (t-1);
+%     else
+%         disp([num2str(dl_prev), ' | ',num2str(t)])
+%         % disp('??????????????????????????????????')
+%         value = (t-1)+(-ddl+9.81)-15; % SOMETHING WRONG HERE
+%         % ddl is making problems
+%     end
+% 
+% 
+%     isterminal = 1;  % Stop the integration
+%     direction  = +1; % (+1: detect zeros where the event funtion is increasing)
+% 
+%     % disp(['value: ', num2str(value), ' | t: ', num2str(t)])
+% end
 
 
     % if t<0.3

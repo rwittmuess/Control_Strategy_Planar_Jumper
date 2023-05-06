@@ -1,4 +1,4 @@
-function ds = robot_dynamics(t,s)
+function ds = robot_dynamics(t,s,s_prev)
 
 
     %% Setting constants
@@ -78,7 +78,6 @@ function ds = robot_dynamics(t,s)
     D = reshape([t3.*(7.2e+1./2.5e+1)+t9.*(9.9e+1./5.0e+1)+t17+4.5808,t33,t31,t32,t30,t33,t17+2.971,t27,t29,t28,t31,t27,7.63e+2./5.0e+2,t26,t23,t32,t29,t26,7.5e+1./4.0,0.0,t30,t28,t23,0.0,7.5e+1./4.0],[5,5]);
     %% Cq
     % Cq = Cq_gen(s);
-
     t2 = sq2;
     t3 = sq3;
     t4 = q1+q2;
