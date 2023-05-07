@@ -5,7 +5,6 @@ function PlanarJumper
     * make event function dependend on l'' < -g for lift-off
     * plot desired path and actual path to make sure robot follows desired path
     * 
-    * adapt landing to be smooth
     * calculate K_i's for desired height/speed/time,...
 
 %}
@@ -104,50 +103,58 @@ sData_LandingPhase = s;
 % sData = [sData;s(2:end,:)];
 
 
-%%
-% t = 0;
-% q = [0,-pi/4,pi/2,0,0];
-
+%% ANIMATION
 qData = sData(:,1:5);
 animateRobot(tData,qData)
 
 
+%% GROUND PHASE: 
+% l_ref & l_real
+lref_LO = lref_LO_gen(tData_GroundPhase);
+l = l_gen(sData_GroundPhase(:,1:5)')';
+
+figure
+plot(tData_GroundPhase,lref_LO, 'LineWidth', 1.5);hold on; grid on;
+plot(tData_GroundPhase,l, 'LineWidth', 1.5); 
+xlabel({'$t$ in [$s$]'}, 'Interpreter', 'latex') 
+ylabel({'$l$ in [$m$]'}, 'Interpreter', 'latex') 
+legend({'$l_{ref}$', '$l_{real}$'}, 'Interpreter', 'latex')
+title({'Ground Phase: $l_{ref}$ and $l_{real}$'}, 'Interpreter', 'latex')
+
+temp = gca;
+exportgraphics(temp,'./plots/GroundPhase_lref_l.pdf','ContentType','vector')
+
+
+% dl_ref & dl_real
+dlref_LO = dlref_LO_gen(tData_GroundPhase);
+dl = dl_gen(sData_GroundPhase')';
+
+figure
+plot(tData_GroundPhase,dlref_LO, 'LineWidth', 1.5); hold on; grid on;
+plot(tData_GroundPhase,dl, 'LineWidth', 1.5); 
+xlabel({'$t$ in [$s$]'}, 'Interpreter', 'latex') 
+ylabel({'$\dot{l}$ in [$\frac{m}{s}$]'}, 'Interpreter', 'latex') 
+legend({'$\dot{l}_{ref}$', '$\dot{l}_{real}$'}, 'Interpreter', 'latex')
+title({'Ground Phase: $\dot{l}_{ref}$ and $\dot{l}_{real}$'}, 'Interpreter', 'latex')
+
+temp = gca;
+exportgraphics(temp,'./plots/GroundPhase_dlref_dl.pdf','ContentType','vector')
+
+
 %%
-% lref_LO = lref_LO_gen(tData);
-% l = l_gen(qData')';
-% % t1s_val = [tData';ones(length(tData)*1)];
-% % lref_F = lref_F_gen(t1s_val,sData);
-% % lref_F = [zeros(1,101),lref_F]';
-% % zFref = zFref_gen(t1s_val);
+% t1s_val = [tData';ones(length(tData)*1)];
+% lref_F = lref_F_gen(t1s_val,sData);
+% lref_F = [zeros(1,101),lref_F]';
+% zFref = zFref_gen(t1s_val);
+%% 
 % 
-% %%
+% ds2 = [sData, ds(6:end,:)'];
 % 
-% % ds = robot_dynamics(tData,sData');
+% ddl = ddl_gen(ds2')';
 % 
-% figure(1)
-% plot(tData,l);
-% hold on;
-% grid on;
-% plot(tData,lref_LO);
-% legend(["l_{real}", "lref_{LO}"]);
-% 
-% dlref_LO = dlref_LO_gen(tData);
-% dl = dl_gen(sData')';
-% 
-% figure(2)
-% plot(tData,dl);
-% hold on;
-% grid on;
-% plot(tData,dlref_LO);
-% legend(["dl_{real}", "dlref_{LO}"])
-% % 
-% % ds2 = [sData, ds(6:end,:)'];
-% % 
-% % ddl = ddl_gen(ds2')';
-% % 
-% % ddl = diff(dl)/(tData(2)-tData(1));
-% 
-% %%
+% ddl = diff(dl)/(tData(2)-tData(1));
+
+%%
 % tF = tData(101:end);
 % t1s_val = [tF';ones(1,length(tF))*1];
 % %%
@@ -203,11 +210,9 @@ animateRobot(tData,qData)
 
 end
 
-
+%% USING THE PROFILER INSIDE THE FUNCTION
 %% activate Profiler
 % profile on
-% Run code to profile
 %% deactivate Profiler
-% Path where you want to store the HTML profiler results
 % html_folder = './Profiler';
 % profsave(profile('info'), html_folder)

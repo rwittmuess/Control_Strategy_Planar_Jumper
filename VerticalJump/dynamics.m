@@ -21,7 +21,7 @@ tau = [tau1;tau2;tau3];
 
 l1 = 0.3;
 l2 = 0.3;
-l3 = 0.6; % I made this number up, not given by paper
+l3 = 0.5; % I made this number up, not given by paper
 
 lc1 = 0.16;
 lc2 = 0.15;
