@@ -16,11 +16,6 @@ clc; clear; close all;
 % dynamics;
 
 
-%% activate Profiler
-% profile on
-% Run code to profile
-
-
 %% Settings for increasing computational speed
 reltol_start    = 1e-2;
 abstol_start    = 1e-3;
@@ -48,9 +43,6 @@ sData = s(1:end-1,:);
 tData_GroundPhase = t;
 sData_GroundPhase = s;
 
-% qData = sData(:,1:5);
-% animateRobot(tData,qData)
-
 
 %% FLIGHT PHASE
 % s0 = [0.643551279512161, -1.38116878810655, 0.737613340437614, -4.36564827749447e-15, 2.25977590679604e-14, -1.04637683867421, 2.32542793026359, -1.28181713291239, -6.02979306700862e-15, 3.01614185027691e-14];
@@ -68,6 +60,26 @@ tData_FlightPhase = t;
 sData_FlightPhase = s;
 
 
+%% LANDING PHASE
+s0 = sData(end,:);
+s0(9:10) = [0,0]; % to satisfy assumptions of the paper
+
+% -> = [0.7122   -1.6219    0.9931   -0.0000   -0.0052    0.6455   -2.2303  2.2222   -0.5956   -0.0477]; we get this
+%--> = [0.7122   -1.6219    0.9931   -0.0000   -0.0052    0.6455   -2.2303  2.2222   -0.0000   -0.0000]; we modify it to this
+% s0 = [0.6437   -1.3817    0.7380   -0.0000   -0.0000   -1.2026    2.5749 -1.4090   -0.0000   -0.0000]; % s(end) from Ground_Phase
+
+t_LI = tData(end);
+
+Opt = odeset('Events', @(t,s)robotics_landing_event(t,s,t_LI),'RelTol',reltol_start,'AbsTol',abstol_start);
+[t,s] = ode45(@(t,s) robot_dynamics_landing(t,s,t_LI), tData(end):0.01:tData(end-1)+2, s0, Opt);
+
+tData = [tData;t(2:end)];
+sData = [sData;s(2:end,:)];
+tData_LandingPhase = t;
+sData_LandingPhase = s;
+
+
+
 %% Get new trajectory for LANDING PHASE
 % % https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=4758204
 % % https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=4755928
@@ -82,31 +94,6 @@ sData_FlightPhase = s;
 % disp(dzCOM_array(index))
 % disp(dzCOM_array(index+1))
 
-%% LANDING PHASE
-s0 = sData(end,:);
-s0(9:10) = [0.0,0.0]; % to satisfy assumptions of the paper
-
-% -> = [0.7122   -1.6219    0.9931   -0.0000   -0.0052    0.6455   -2.2303  2.2222   -0.5956   -0.0477]; we get this
-%--> = [0.7122   -1.6219    0.9931   -0.0000   -0.0052    0.6455   -2.2303  2.2222   -0.0000   -0.0000]; we modify it to this
-% s0 = [0.6437   -1.3817    0.7380   -0.0000   -0.0000   -1.2026    2.5749 -1.4090   -0.0000   -0.0000]; % s(end) from Ground_Phase
-
-t_LI = tData(end);
-
-Opt = odeset('Events', @(t,s)robotics_landing_event(t,s,t_LI),'RelTol',reltol_start,'AbsTol',abstol_start);
-[t,s] = ode45(@(t,s) robot_dynamics_landing(t,s,t_LI), 0:0.01:2, s0, Opt);
-
-t_corrected = t(2:end)+tData(end);
-tData = [tData;t_corrected];
-sData = [sData;s(2:end,:)];
-
-tData_BouncePhase = t_corrected;
-sData_BouncePhase = s;
-
-
-%% JUST TO TEST!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-% qData = sData_BouncePhase(:,1:5);
-% animateRobot(tData_BouncePhase,qData)
 
 %% prepare next jump
 % s0 = sData(end,:);
@@ -116,12 +103,6 @@ sData_BouncePhase = s;
 % 
 % tData = [tData;t(2:end)];
 % sData = [sData;s(2:end,:)];
-
-
-%% deactivate Profiler
-% Path where you want to store the HTML profiler results
-% html_folder = './Profiler';
-% profsave(profile('info'), html_folder)
 
 
 %%
@@ -206,7 +187,6 @@ animateRobot(tData,qData)
 % dzCOM = dzCOM_gen(sData(101:end,:)');
 % 
 % 
-% 
 % figure(5)
 % hold on;
 % grid on;
@@ -223,3 +203,12 @@ animateRobot(tData,qData)
 % plot(tTest,zFref);
 
 end
+
+
+%% activate Profiler
+% profile on
+% Run code to profile
+%% deactivate Profiler
+% Path where you want to store the HTML profiler results
+% html_folder = './Profiler';
+% profsave(profile('info'), html_folder)
