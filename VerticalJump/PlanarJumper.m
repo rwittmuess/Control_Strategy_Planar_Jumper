@@ -79,7 +79,6 @@ tData_LandingPhase = t;
 sData_LandingPhase = s;
 
 
-
 %% Get new trajectory for LANDING PHASE
 % % https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=4758204
 % % https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=4755928
