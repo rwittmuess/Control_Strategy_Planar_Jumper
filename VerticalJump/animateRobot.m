@@ -1,19 +1,22 @@
 % Animate the Three-Link Walker
+
 function animateRobot(tData, qData)
     figure(1000)
-
-    for i =1:length(tData) 
-        clf ;
-        drawRobot(qData(i, :)');
-        line([-1, 1],[0;0],'Color', 'k', 'LineWidth', 2)
-        axis([-1 1 -0.5 1.5]) ; 
-        axis equal
-        grid on ;
-        drawnow ;
-        pause(0.0001) ;
+    for i = 1:length(tData)
+        clf;
+        drawRobot(qData(i,:)');
+        line([-1, 1], [0;0], 'Color', 'k', 'LineWidth', 2);
+        axis([-1 1 -0.5 1.5]);
+        axis equal;
+        grid on;
+        drawnow;
+        % pause(0.0001) ;
+        % Make it dependent on the "real" time steps
+        if i < length(tData)
+            pause(tData(i+1) - tData(i));
+        end
     end
 end
-
 
 % Draw one frame of the Three-Link Walker
 function drawRobot(q)
