@@ -204,7 +204,7 @@ lref_F = zCOM_kin - zFref;
 dlref_F = dzCOM_kin - dzFref;
 
 
-% reference druing land phase
+% reference during landing phase
 lref_LI = simplify(-k31*1/(cosh(k32*(t2star - tl_min))^2)-k33);
 dlref_LI = simplify(diff(lref_LI,ts));
 

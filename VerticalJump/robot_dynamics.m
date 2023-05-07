@@ -1,4 +1,4 @@
-function ds = robot_dynamics(t,s,s_prev)
+function ds = robot_dynamics(t,s)
 
 
     %% Setting constants

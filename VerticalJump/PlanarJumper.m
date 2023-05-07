@@ -68,19 +68,45 @@ tData_FlightPhase = t;
 sData_FlightPhase = s;
 
 
-%% LANDING PHASE
+%% Get new trajectory for LANDING PHASE
+% % https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=4758204
+% % https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=4755928
+% 
+% % get position where velocity is 0
+% dzCOM_array = dzCOM_gen(sData_GroundPhase(:,:)');
+% dzCOM_array = dzCOM_array(2:end); % to avoid the first entry as the speed will be 0 there.
+% 
+% % Find the index where the values go from negative to positive
+% index = find(diff(sign(dzCOM_array)) > 0, 1);
+% disp(index);
+% disp(dzCOM_array(index))
+% disp(dzCOM_array(index+1))
 
+%% LANDING PHASE
 s0 = sData(end,:);
+s0(9:10) = [0.0,0.0]; % to satisfy assumptions of the paper
+
+% -> = [0.7122   -1.6219    0.9931   -0.0000   -0.0052    0.6455   -2.2303  2.2222   -0.5956   -0.0477]; we get this
+%--> = [0.7122   -1.6219    0.9931   -0.0000   -0.0052    0.6455   -2.2303  2.2222   -0.0000   -0.0000]; we modify it to this
 % s0 = [0.6437   -1.3817    0.7380   -0.0000   -0.0000   -1.2026    2.5749 -1.4090   -0.0000   -0.0000]; % s(end) from Ground_Phase
 
 t_LI = tData(end);
 
 Opt = odeset('Events', @(t,s)robotics_landing_event(t,s,t_LI),'RelTol',reltol_start,'AbsTol',abstol_start);
-[t,s] = ode45(@(t,s) robot_dynamics_landing(t,s,t_LI), tData(end):0.01:tData(end-1)+3, s0, Opt);
+[t,s] = ode45(@(t,s) robot_dynamics_landing(t,s,t_LI), 0:0.01:2, s0, Opt);
 
-tData = [tData;t(2:end)];
+t_corrected = t(2:end)+tData(end);
+tData = [tData;t_corrected];
 sData = [sData;s(2:end,:)];
 
+tData_BouncePhase = t_corrected;
+sData_BouncePhase = s;
+
+
+%% JUST TO TEST!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+% qData = sData_BouncePhase(:,1:5);
+% animateRobot(tData_BouncePhase,qData)
 
 %% prepare next jump
 % s0 = sData(end,:);

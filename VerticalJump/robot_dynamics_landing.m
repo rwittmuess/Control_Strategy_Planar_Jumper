@@ -53,3 +53,27 @@ function ds = robot_dynamics_landing(t,s,t_LI)
     ds(6:10) = D\(F-Cq-G);
    
 end
+
+% 
+%     %% Calculating
+%     % D33_inv = D(1:3,1:3)\eye(3);
+%     % D_inv = D\eye(5);
+%     Phi = Jy*D33_inv;
+%     %Phi = Jy/D(1:3,1:3);
+% 
+%     sigma = [dlt + lambda1*lt;...
+%              dtheta + lambda2*theta;...
+%              dtheta3 + lambda3*theta3];
+% 
+%     tau = -Phi\(sign(sigma).*[M1;M2;M3]);
+% 
+%     F0 = Cq(4:5) + G(4:5) + D(4:5,1:3) * (D33_inv*(tau - Cq(1:3) - G(1:3)));
+% 
+%     F = [tau;F0];
+% 
+%     % ds = zeros(10,1);
+%     % ds(1:5) = s(6:10);
+%     % ds(6:10) = D\(F-Cq-G);
+%     ds = [s(6:10);D_inv*(F-Cq-G)];
+% 
+% end

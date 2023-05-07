@@ -4,6 +4,9 @@ function [value, isterminal, direction] = robotics_event(t,~)
     isterminal = 1;  % Stop the integration
     direction  = +1; % (+1: detect zeros where the event funtion is increasing)
 end
+
+
+
 % function [value, isterminal, direction] = robotics_event(t,s)
 % 
 %     persistent dl_prev % Declare ddl_prev as a persistent variable
@@ -34,33 +37,13 @@ end
 %     % disp(['value: ', num2str(value), ' | t: ', num2str(t)])
 % end
 
-
-    % if t<0.3
-    %     value = ddl+9.81-t-10;
-    %     disp(['t small | t: ', num2str(t), ' | value: ', num2str(value)])
-    % else
-    %     value = ddl+9.81;
-    %     disp(['t big', num2str(value)])
-    % end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+% if t<0.3
+%     value = ddl+9.81-t-10;
+%     disp(['t small | t: ', num2str(t), ' | value: ', num2str(value)])
+% else
+%     value = ddl+9.81;
+%     disp(['t big', num2str(value)])
+% end
 
 % function [value, isterminal, direction] = robotics_event(t,s)
 % 
