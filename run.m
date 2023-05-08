@@ -60,7 +60,8 @@ dynamics(   k11, k12, k13, k14,...
 [   tData, sData, ...
     tData_GroundPhase, sData_GroundPhase, ...
     tData_FlightPhase, sData_FlightPhase, ...
-    tData_LandingPhase, sData_LandingPhase] = PlanarJumper(td_LO,tz_Fmax,tl_min,tl_end);
+    tData_LandingPhase, sData_LandingPhase,...
+    LOv] = PlanarJumper(td_LO,tz_Fmax,tl_min,tl_end);
 
 
 %% ANIMATION
@@ -106,31 +107,26 @@ exportgraphics(temp,'plots/GroundPhase_dlref_dl.pdf','ContentType','vector')
 %% FLIGHT PHASE
 %z_F_ref & z_F_real
 
+l_LO    = LOv(1);
+dl_LO   = LOv(2);
+
+
 zFref   = zFref_gen([tData_FlightPhase';ones(1,length(tData_FlightPhase))*td_LO;ones(1,length(tData_FlightPhase))*tz_Fmax]);
-zFreal  = zCOM_kin_gen([tData_FlightPhase;td_LO;tz_Fmax;l_LO;dl_LO]) ...
-        - l_gen(sData_FlightPhase(:,2:3));
+zFreal  = zCOM_kin_gen([tData_FlightPhase';ones(1,length(tData_FlightPhase))*td_LO;ones(1,length(tData_FlightPhase))*tz_Fmax;ones(1,length(tData_FlightPhase))*l_LO;ones(1,length(tData_FlightPhase))*dl_LO]) ...
+        - l_gen(sData_FlightPhase(:,1:3)');
 
 figure
 hold on;
 grid on;
-plot(t_flight_ref,zF_flight_ref, 'LineWidth', 1.5);hold on; grid on;
-% plot(t,dlref, 'LineWidth', 1.5); 
-% plot(t,ddlref);
+plot(tData_FlightPhase,zFref, 'LineWidth', 3);hold on; grid on;
+plot(tData_FlightPhase,zFreal, 'LineWidth', 1.5);
 xlabel({'$t$ in [$s$]'}, 'Interpreter', 'latex') 
-ylabel({'$z_{ref}^z$ in [$m$]'}, 'Interpreter', 'latex') 
-legend({'$z_{ref}^z$'}, 'Interpreter', 'latex')
-title({'Flight Phase: $z_{ref}^z$'}, 'Interpreter', 'latex')
+ylabel({'$z_{ref}^F$ and $z_{real}^F$ in [$m$]'}, 'Interpreter', 'latex') 
+legend({'$z_{ref}^F$','$z_{real}^F$'}, 'Interpreter', 'latex')
+title({'Flight Phase: $z_{ref}^F$ and $z_{real}^F$'}, 'Interpreter', 'latex')
 
 temp = gca;
 exportgraphics(temp,'./plots/FlightPhase_zFref_zFreal.pdf','ContentType','vector')
-
-
-
-
-
-
-
-
 
 
 %%
