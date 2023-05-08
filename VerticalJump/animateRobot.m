@@ -1,13 +1,12 @@
 % Animate the Vertical Jumper
-
 function animateRobot(tData, qData)
-    figure(1000)
+    figure
     for i = 1:length(tData)
         clf;
-        % drawFloor;
+        drawFloor;
         drawRobot(qData(i,:)');
-        axis([-1 1 -0.5 1.5]);
         axis equal;
+        axis([-1 1 -0.5 1.5]);
         grid on;
         drawnow;
         % pause(0.0001) ;
@@ -39,7 +38,7 @@ function drawRobot(q)
         hold on;
     h(2) = line([pKnee(1);pHip(1)], [pKnee(2);pHip(2)], 'Color', 'k', 'LineWidth', 2,'DisplayName','upper leg');
     h(3) = line([pHip(1);pHead(1)], [pHip(2);pHead(2)], 'Color', 'k', 'LineWidth', 2,'DisplayName','body');
-    h(4) = plot(pHip(1), pHip(2), 'ko', 'MarkerSize',7,'MarkerFaceColor',[196/255, 130/255, 14/255],'DisplayName','hip');
+    h(4) = plot(pHip(1), pHip(2), 'ko', 'MarkerSize',7,'MarkerFaceColor',[217/255, 102/255, 31/255],'DisplayName','hip');
     h(5) = plot(pKnee(1), pKnee(2), 'ko', 'MarkerSize',7,'MarkerFaceColor',[59/255, 126/255, 161/255],'DisplayName','knee');
     h(6) = plot(xF, zF, 'ko', 'MarkerSize',7,'MarkerFaceColor',[253/255, 181/255, 21/255],'DisplayName','foot');
     h(7) = plot(pCOM(1), pCOM(2), 'ko', 'MarkerSize',4,'MarkerEdgeColor','k','MarkerFaceColor','r','DisplayName','CoM'); 

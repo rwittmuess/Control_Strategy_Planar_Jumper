@@ -1,4 +1,4 @@
-function ds = robot_dynamics_landing(t,s,t_LI)
+function ds = robot_dynamics_landing(t,s,t_LI,tl_min,tl_end)
     
 
     %% Setting constants
@@ -28,8 +28,8 @@ function ds = robot_dynamics_landing(t,s,t_LI)
     
     l = l_gen(s(1:5));
     dl = dl_gen(s);
-    lref_LI = lref_LI_gen([t;t_LI]);
-    dlref_LI = dlref_LI_gen([t;t_LI]);
+    lref_LI = lref_LI_gen([t;t_LI;tl_min]);
+    dlref_LI = dlref_LI_gen([t;t_LI;tl_min]);
     lt = l - lref_LI;
     dlt = dl - dlref_LI;
 

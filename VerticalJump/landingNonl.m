@@ -1,17 +1,39 @@
-function [c,ceq] = landingNonl(x, tl_min, linit, lend)
-    ceq = [-x(1)*1/(cosh(2*(0 - tl_min))^2)-x(2) - linit;...
-         -x(1)*1/(cosh(2*(3 - tl_min))^2)-x(2) - lend];
-%     linit = -x(1)*1/(cosh(x(2)*(0 - tl_min))^2)-x(3);
-%     lend = -x(1)*1/(cosh(x(2)*(3*tl_min - tl_min))^2)-x(3);
+function [c,ceq] = landingNonl(k,tl_min,tl_end,lF,dlF)
+    k31 = k(1);
+    k32 = k(2);
+    k33 = k(3);
+    g = 9.81;
     
+    % lref_LI = -k31*1/(cosh(k32*(t - tl_min))^2)-k33
+    % lref_LI' = 2*k31*k32*tanh(k32*(t-tl_min))*sech(k32*(t-tl_min))
+    
+    %%% equality constraints c(k) = 0 %%%
+    % lref_LI(0) = lF
+    eq1 = -k31*1/(cosh(k32*(0 - tl_min))^2)-k33 - lF;
+    % lref_LI'(0) = dlF
+    eq2 = k31*2*k32*sinh(k32*(0-tl_min))*cosh(k32*(0-tl_min))*k32 - dlF;
+    % lref_LI'(tl_end) = 0
+%     eq3 = 2*k31*k32*tanh(k32*(tl_end-tl_min))*sech(k32*(tl_end-tl_min));
+
+    ceq = [eq1; eq2];
+
+    
+    %%% inequality constraints c(k) <= 0 %%%
+    % lref(t) >= 0.3
+    % lref(t) <= 0.71
+    % lref(td_LO) <= 0.6
+    % lref(td_LO) >= 0.5
+    
+    c = [];
     j=0;
-    for i = 0:0.1:3
+    for i = 0:0.01:tl_end
         j = j+1;
-        c(j) = -(-x(1)*1/(cosh(2*(i*tl_min - tl_min))^2)-x(2)) + 0.3;
+        c(j) = -(-k31*1/(cosh(k32*(i - tl_min))^2)-k33) + 0.3;
         j = j+1;
-        c(j) = -x(1)*1/(cosh(2*(i*tl_min - tl_min))^2)-x(2) - lend;
+        c(j) = -k31*1/(cosh(k32*(i - tl_min))^2)-k33 - 0.71;
     end
-%     for i = 0:0.1:3*tl_min
-%         0.3 <= -x(1)*1/(cosh(x(2)*(i*tl_min - tl_min))^2)-x(3);
-%         lend >= -x(1)*1/(cosh(x(2)*(i*tl_min - tl_min))^2)-x(3);
-%     end
+    j = j+1;
+    c(j) = 2*k31*k32*tanh(k32*(tl_end-tl_min))*sech(k32*(tl_end-tl_min)) - 0.05;
+
+    
+end

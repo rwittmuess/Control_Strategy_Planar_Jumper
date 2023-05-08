@@ -152,16 +152,17 @@ matlabFunction(JyF,     'File', 'gen/JyF_gen',      'Vars', {q});
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-syms ts tLO tLI dl_LO l_LO real
+syms ts tLI dl_LO l_LO td_LO tl_min tz_Fmax real
 % ts: time
 % tLO: actual time at lift-off
 % tLI: actual time at landing instance
 
-tstar = ts - tLO;
+tstar = ts - td_LO;
 t2star = ts - tLI;
 
-t1s = [ts;tLO];
-t2s = [ts;tLI];
+t0s = [ts;td_LO];
+t1s = [ts;td_LO;tz_Fmax];
+t2s = [ts;tLI;tl_min];
 
 LO = [l_LO;dl_LO];
 
@@ -183,12 +184,12 @@ t1sLO = [t1s;LO];
 % k32 = 2;
 % k33 = -0.686209256691246; %0.58;
 
-% desired parameters
-td_LO = 1; % time of lift-off
-zd_Fmax = 0.12; % max foot hight in ther air
-dld_LO = 0.4; % speed of CoM at lift-off
-tz_Fmax = 0.075; % time after which max foot hight is reached
-tl_min = 0.2; % something for landing instance, I think the time after which l / hence COM will have its lowest value
+% % desired parameters
+% td_LO = 1; % time of lift-off
+% zd_Fmax = 0.12; % max foot hight in ther air
+% dld_LO = 0.4; % speed of CoM at lift-off
+% tz_Fmax = 0.075; % time after which max foot hight is reached
+% tl_min = 0.2; % something for landing instance, I think the time after which l / hence COM will have its lowest value
 
 % reference during stance phase of the CoM
 lref_LO = simplify(k11 * tanh(k12 * (ts - td_LO)) - 0.5*g*ts^2 + k13*ts + k14);
@@ -219,8 +220,8 @@ if ~exist('./gen')
 end
 addpath('./gen')
 
-matlabFunction(lref_LO,  'File',  'gen/lref_LO_gen', 'Vars', {ts});
-matlabFunction(dlref_LO, 'File', 'gen/dlref_LO_gen', 'Vars', {ts});
+matlabFunction(lref_LO,  'File',  'gen/lref_LO_gen', 'Vars', {t0s});
+matlabFunction(dlref_LO, 'File', 'gen/dlref_LO_gen', 'Vars', {t0s});
 
 matlabFunction(zFref,  'File', 'gen/zFref_gen',  'Vars', {t1s});
 matlabFunction(dzFref, 'File', 'gen/dzFref_gen', 'Vars', {t1s});

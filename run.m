@@ -6,6 +6,9 @@
     * 
     * calculate K_i's for desired height/speed/time,...
 
+    * take desired tz_min and other values into the dynamics to generate ts
+    * and tss
+
 %}
 
 
@@ -24,15 +27,15 @@ clc; clear; close all;
 
 % Jump-off settings
 td_LO = 1; % time of lift-off (min = 0.1, max = 1)
-dld_LO = 0.7; % speed of CoM at lift-off (max = 0.9, min = 0.1)
+dld_LO = 0.8; % speed of CoM at lift-off (max = 0.9, min = 0.1)
 
 % Flight settings
-zd_Fmax = 0.2; % max foot hight in the air (min max depends on jump-off, see below)
-tz_Fmax = 0.175; % time after which max foot hight is reached, half of flight time
+zd_Fmax = 0.5; % max foot hight in the air (min max depends on jump-off, see below)
+tz_Fmax = 0.2; % time after which max foot hight is reached, half of flight time
 
 % Landing settings
-tl_min = 0.4; % time after which lowest COM is reached
-tl_end = 2; % time after which landing is finished (at as big as tl_min
+tl_min = 0.2; % time after which lowest COM is reached
+tl_end = 1; % time after which landing is finished (at as big as tl_min
 
 % Re-jump settings
 % t_rejump = 1; % time between landing and jump-off
@@ -42,7 +45,8 @@ tl_end = 2; % time after which landing is finished (at as big as tl_min
 [   k11, k12, k13, k14,...
     k21, k22, k23,...
     k31, k32, k33,...
-    k41, k42, k43, k44] = optimizingReferences(td_LO, dld_LO, zd_Fmax, tz_Fmax, tl_min, tl_end);
+    k41, k42, k43, k44,...
+    zd_Fmax, tz_Fmax] = optimizingReferences(td_LO, dld_LO, zd_Fmax, tz_Fmax, tl_min, tl_end);
 
 
 %% Generate Dynamics
@@ -56,7 +60,7 @@ dynamics(   k11, k12, k13, k14,...
 [   tData, sData, ...
     tData_GroundPhase, sData_GroundPhase, ...
     tData_FlightPhase, sData_FlightPhase, ...
-    tData_LandingPhase, sData_LandingPhase] = PlanarJumper;
+    tData_LandingPhase, sData_LandingPhase] = PlanarJumper(td_LO,tz_Fmax,tl_min,tl_end);
 
 
 %% ANIMATION
@@ -66,10 +70,12 @@ animateRobot(tData,qData)
 
 %% GROUND PHASE: 
 % l_ref & l_real
-lref_LO = lref_LO_gen(tData_GroundPhase);
+lref_LO = lref_LO_gen([tData_GroundPhase';ones(1,length(tData_GroundPhase))*td_LO]);
 l = l_gen(sData_GroundPhase(:,1:5)')';
 
 figure
+hold on;
+grid on;
 plot(tData_GroundPhase,lref_LO, 'LineWidth', 1.5);hold on; grid on;
 plot(tData_GroundPhase,l, 'LineWidth', 1.5); 
 xlabel({'$t$ in [$s$]'}, 'Interpreter', 'latex') 
@@ -82,7 +88,7 @@ exportgraphics(temp,'./plots/GroundPhase_lref_l.pdf','ContentType','vector')
 
 
 % dl_ref & dl_real
-dlref_LO = dlref_LO_gen(tData_GroundPhase);
+dlref_LO = dlref_LO_gen([tData_GroundPhase';ones(1,length(tData_GroundPhase))*td_LO]);
 dl = dl_gen(sData_GroundPhase')';
 
 figure
@@ -95,6 +101,36 @@ title({'Ground Phase: $\dot{l}_{ref}$ and $\dot{l}_{real}$'}, 'Interpreter', 'la
 
 temp = gca;
 exportgraphics(temp,'plots/GroundPhase_dlref_dl.pdf','ContentType','vector')
+
+
+%% FLIGHT PHASE
+%z_F_ref & z_F_real
+
+zFref   = zFref_gen([tData_FlightPhase';ones(1,length(tData_FlightPhase))*td_LO;ones(1,length(tData_FlightPhase))*tz_Fmax]);
+zFreal  = zCOM_kin_gen([tData_FlightPhase;td_LO;tz_Fmax;l_LO;dl_LO]) ...
+        - l_gen(sData_FlightPhase(:,2:3));
+
+figure
+hold on;
+grid on;
+plot(t_flight_ref,zF_flight_ref, 'LineWidth', 1.5);hold on; grid on;
+% plot(t,dlref, 'LineWidth', 1.5); 
+% plot(t,ddlref);
+xlabel({'$t$ in [$s$]'}, 'Interpreter', 'latex') 
+ylabel({'$z_{ref}^z$ in [$m$]'}, 'Interpreter', 'latex') 
+legend({'$z_{ref}^z$'}, 'Interpreter', 'latex')
+title({'Flight Phase: $z_{ref}^z$'}, 'Interpreter', 'latex')
+
+temp = gca;
+exportgraphics(temp,'./plots/FlightPhase_zFref_zFreal.pdf','ContentType','vector')
+
+
+
+
+
+
+
+
 
 
 %%

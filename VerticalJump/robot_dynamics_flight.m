@@ -1,4 +1,4 @@
-function ds = robot_dynamics_flight(t,s,LOv)
+function ds = robot_dynamics_flight(t,s,LOv,td_LO,tz_Fmax)
 
     % persistent lambda1 lambda2 M1 M2 td_LO
 
@@ -12,7 +12,7 @@ function ds = robot_dynamics_flight(t,s,LOv)
     M1 = 100;%300
     M2 = 100;
 
-    td_LO = 1; % time of lift-off; later take actually lift-off time, if I can manage to make lift off event depended on acceleraion for instance
+%     td_LO = 1; % time of lift-off; later take actually lift-off time, if I can manage to make lift off event depended on acceleraion for instance
 
 
     %% D
@@ -28,9 +28,9 @@ function ds = robot_dynamics_flight(t,s,LOv)
     %% dl
     dl = dl_gen(s);
     %% lref_F
-    lref_F = lref_F_gen([t;td_LO;LOv]);
+    lref_F = lref_F_gen([t;td_LO;tz_Fmax;LOv]);
     %% dlref_F
-    dlref_F = dlref_F_gen([t;td_LO;LOv]);
+    dlref_F = dlref_F_gen([t;td_LO;tz_Fmax;LOv]);
     %% lt
     lt = l - lref_F;
     %% dlt

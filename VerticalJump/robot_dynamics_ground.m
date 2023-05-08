@@ -1,4 +1,4 @@
-function ds = robot_dynamics_ground(t,s)
+function ds = robot_dynamics_ground(t,s,td_LO)
 
 
     %% Setting constants
@@ -30,9 +30,9 @@ function ds = robot_dynamics_ground(t,s)
     %% dl
     dl = dl_gen(s);
     %% lref_LO
-    lref_LO = lref_LO_gen(t);
+    lref_LO = lref_LO_gen([t;td_LO]);
     %% dlref_LO
-    dlref_LO = dlref_LO_gen(t);
+    dlref_LO = dlref_LO_gen([t;td_LO]);
     %% lt
     lt = l - lref_LO;
     %% dlt

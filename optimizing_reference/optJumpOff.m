@@ -7,8 +7,8 @@ function [k11, k12, k13, k14] = optJumpOff(td_LO, dld_LO)
     Aineq = []; Bineq = []; % we have no linear inequality constraints
     Aeq = []; Beq = []; % we have no equality constraints
     
-    LB = [-Inf, -Inf, -Inf];
-    UB = [Inf, Inf, Inf];
+    LB = [-Inf, -Inf, -Inf, -Inf];
+    UB = [Inf, Inf, Inf, Inf];
     
     options = optimset('display','iter','diffmaxchange',1.1*1e-5,'diffminchange',1e-5,'MaxFunEvals',200000,'MaxIter',200000,'TolCon',0.1,'Display','notify');
     
