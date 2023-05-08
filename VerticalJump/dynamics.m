@@ -1,3 +1,8 @@
+function dynamics(  k11, k12, k13, k14,...
+                    k21, k22, k23,...
+                    k31, k32, k33,...
+                    k41, k42, k43, k44)
+
 syms q1 q2 q3 real
 syms dq1 dq2 dq3 real
 syms zF xF real
@@ -163,20 +168,20 @@ LO = [l_LO;dl_LO];
 t1sLO = [t1s;LO];
 
 % parameter take-off trajectory
-k11 = 6.32;
-k12 = 1.8;
-k13 = -1.17;
-k14 = 6.67;
+% k11 = 6.32;
+% k12 = 1.8;
+% k13 = -1.17;
+% k14 = 6.67;
 
 % parameter flight trajectory
-k21 = 0.13;
-k22 = 25;
-k23 = 0.01;
+% k21 = 0.13;
+% k22 = 25;
+% k23 = 0.01;
 
 % parameter landing trajectory
-k31 = 0.169241108569274; %0.1;
-k32 = 2;
-k33 = -0.686209256691246; %0.58;
+% k31 = 0.169241108569274; %0.1;
+% k32 = 2;
+% k33 = -0.686209256691246; %0.58;
 
 % desired parameters
 td_LO = 1; % time of lift-off

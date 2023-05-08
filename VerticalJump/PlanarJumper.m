@@ -1,20 +1,7 @@
-function PlanarJumper
-%% Legged Robots - Final Project
-%{
-    ToDo:
-    * make event function dependend on l'' < -g for lift-off
-    * plot desired path and actual path to make sure robot follows desired path
-    * 
-    * calculate K_i's for desired height/speed/time,...
-
-%}
-
-
-%% For a fresh start:
-clc; clear; close all;
-% dynamics;
-
-
+function [  tData, sData, ...
+            tData_GroundPhase, sData_GroundPhase, ...
+            tData_FlightPhase, sData_FlightPhase, ...
+            tData_LandingPhase, sData_LandingPhase] = PlanarJumper
 %% Settings for increasing computational speed
 reltol_start    = 1e-2;
 abstol_start    = 1e-3;
@@ -35,7 +22,7 @@ s0 = [0;-pi/4;pi/2;0;0;...
       0;0;0;0;0];
 
 Opt = odeset('Events', @robotics_event,'RelTol',reltol_start,'AbsTol',abstol_start);
-[t,s] = ode45(@(t,s) robot_dynamics(t,s), tspan_start, s0, Opt);
+[t,s] = ode45(@(t,s) robot_dynamics_ground(t,s), tspan_start, s0, Opt);
 
 tData = t(1:end-1);
 sData = s(1:end-1,:);
@@ -78,141 +65,4 @@ tData_LandingPhase = t;
 sData_LandingPhase = s;
 
 
-%% Get new trajectory for LANDING PHASE
-% % https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=4758204
-% % https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=4755928
-% 
-% % get position where velocity is 0
-% dzCOM_array = dzCOM_gen(sData_GroundPhase(:,:)');
-% dzCOM_array = dzCOM_array(2:end); % to avoid the first entry as the speed will be 0 there.
-% 
-% % Find the index where the values go from negative to positive
-% index = find(diff(sign(dzCOM_array)) > 0, 1);
-% disp(index);
-% disp(dzCOM_array(index))
-% disp(dzCOM_array(index+1))
-
-
-%% prepare next jump
-% s0 = sData(end,:);
-% 
-% Opt = odeset('Events', @robotics_event,'RelTol',reltol_start,'AbsTol',abstol_start);
-% [t,s] = ode45(@(t,s) robot_dynamics(t,s), tData(end):0.01:tData(end)+3, s0, Opt);
-% 
-% tData = [tData;t(2:end)];
-% sData = [sData;s(2:end,:)];
-
-
-%% ANIMATION
-qData = sData(:,1:5);
-animateRobot(tData,qData)
-
-
-%% GROUND PHASE: 
-% l_ref & l_real
-lref_LO = lref_LO_gen(tData_GroundPhase);
-l = l_gen(sData_GroundPhase(:,1:5)')';
-
-figure
-plot(tData_GroundPhase,lref_LO, 'LineWidth', 1.5);hold on; grid on;
-plot(tData_GroundPhase,l, 'LineWidth', 1.5); 
-xlabel({'$t$ in [$s$]'}, 'Interpreter', 'latex') 
-ylabel({'$l$ in [$m$]'}, 'Interpreter', 'latex') 
-legend({'$l_{ref}$', '$l_{real}$'}, 'Interpreter', 'latex')
-title({'Ground Phase: $l_{ref}$ and $l_{real}$'}, 'Interpreter', 'latex')
-
-temp = gca;
-exportgraphics(temp,'./plots/GroundPhase_lref_l.pdf','ContentType','vector')
-
-
-% dl_ref & dl_real
-dlref_LO = dlref_LO_gen(tData_GroundPhase);
-dl = dl_gen(sData_GroundPhase')';
-
-figure
-plot(tData_GroundPhase,dlref_LO, 'LineWidth', 1.5); hold on; grid on;
-plot(tData_GroundPhase,dl, 'LineWidth', 1.5); 
-xlabel({'$t$ in [$s$]'}, 'Interpreter', 'latex') 
-ylabel({'$\dot{l}$ in [$\frac{m}{s}$]'}, 'Interpreter', 'latex') 
-legend({'$\dot{l}_{ref}$', '$\dot{l}_{real}$'}, 'Interpreter', 'latex')
-title({'Ground Phase: $\dot{l}_{ref}$ and $\dot{l}_{real}$'}, 'Interpreter', 'latex')
-
-temp = gca;
-exportgraphics(temp,'./plots/GroundPhase_dlref_dl.pdf','ContentType','vector')
-
-
-%%
-% t1s_val = [tData';ones(length(tData)*1)];
-% lref_F = lref_F_gen(t1s_val,sData);
-% lref_F = [zeros(1,101),lref_F]';
-% zFref = zFref_gen(t1s_val);
-%% 
-% 
-% ds2 = [sData, ds(6:end,:)'];
-% 
-% ddl = ddl_gen(ds2')';
-% 
-% ddl = diff(dl)/(tData(2)-tData(1));
-
-%%
-% tF = tData(101:end);
-% t1s_val = [tF';ones(1,length(tF))*1];
-% %%
-% zFref = zFref_gen(t1s_val);
-% figure(3)
-% hold on;
-% grid on;
-% plot(tF,zFref);
-% plot(tF,sData(101:end,4));
-% legend(["zF_{ref}","zF_{real}"]);
-% 
-% %%
-% % lref_F = lref_F_gen([tF';ones(1,length(tF))*1;ones(1,length(tF))*LOv(1);ones(1,length(tF))*LOv(2)]);
-% zCOM_kin = zCOM_kin_gen([tF';ones(1,length(tF))*1;ones(1,length(tF))*LOv(1);ones(1,length(tF))*LOv(2)]);
-% zFref = zFref_gen([tF';ones(1,length(tF))*1]);
-% pCOM = pCOM_gen(sData(101:end,1:5)');
-% zCOM = pCOM(2,:);
-% 
-% lref_F = zCOM - zFref;
-% 
-% figure(4)
-% hold on;
-% grid on;
-% plot(tF,lref_F);
-% plot(tF,zCOM_kin);
-% plot(tF,zFref);
-% % plot(tF,sData(102:end,4));
-% plot(tF,zCOM);
-% plot(tF,l(101:end));
-% 
-% legend(["lref_F", "zCOM_{kin}", "zF_{ref}", "zCOM_{real}","l_{real}"]);
-% % plot(tF,sData(102:end,4));
-% 
-% 
-% dzCOM_kin = dzCOM_kin_gen([tF';ones(1,length(tF))*1;ones(1,length(tF))*LOv(1);ones(1,length(tF))*LOv(2)]);
-% dzCOM = dzCOM_gen(sData(101:end,:)');
-% 
-% 
-% figure(5)
-% hold on;
-% grid on;
-% plot(tF,dzCOM_kin);
-% plot(tF,dzCOM);
-% legend(["dzCOM_{kin}", "dzCOM_{real}"])
-% 
-% tTest = 1:0.01:1.5;
-% zFref = zFref_gen([tTest;ones(1,length(tTest))*1]);
-% 
-% figure(6)
-% hold on;
-% grid on;
-% plot(tTest,zFref);
-
 end
-
-%% USING THE PROFILER INSIDE THE FUNCTION
-%% activate Profiler
-% profile on
-%% deactivate Profiler
-% html_folder = './Profiler';
-% profsave(profile('info'), html_folder)

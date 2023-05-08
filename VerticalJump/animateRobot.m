@@ -4,7 +4,7 @@ function animateRobot(tData, qData)
     figure(1000)
     for i = 1:length(tData)
         clf;
-        drawFloor;
+        % drawFloor;
         drawRobot(qData(i,:)');
         axis([-1 1 -0.5 1.5]);
         axis equal;
