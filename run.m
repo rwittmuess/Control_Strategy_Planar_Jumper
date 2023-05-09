@@ -116,8 +116,8 @@ zFreal  = zCOM_kin_gen([tData_FlightPhase';ones(1,length(tData_FlightPhase))*td_
 figure
 hold on;
 grid on;
-plot(tData_FlightPhase,zFref, 'LineWidth', 3);hold on; grid on;
-plot(tData_FlightPhase,zFreal, 'LineWidth', 1.5);
+plot(tData_FlightPhase,zFref, 'LineWidth', 1.5);hold on; grid on;
+plot(tData_FlightPhase,zFreal,'--', 'LineWidth', 1.5);
 xlabel({'$t$ in [$s$]'}, 'Interpreter', 'latex') 
 ylabel({'$z_{ref}^{Foot}$ and $z_{real}^{Foot}$ in [$m$]'}, 'Interpreter', 'latex') 
 legend({'$z_{ref}^{Foot}$','$z_{real}^{Foot}$'}, 'Interpreter', 'latex')
@@ -139,10 +139,10 @@ plot(tData,zCOM, 'LineWidth', 1.5);
 plot(tData,sData(:,4), 'LineWidth', 1.5);
 end_value_x = floor(tData(end)) + ceil((tData(end)-floor(tData(end)))/0.25) * 0.25;
 end_value_y = floor(max(zCOM)) + ceil((max(zCOM)-floor(max(zCOM)))/0.25) * 0.25;
-axis([0 end_value 0 end_value_y])
+axis([0 end_value_x 0 end_value_y])
 
 % highlight the area between beginning and end of the flight phase
-area([tData_FlightPhase(1) tData_FlightPhase(end)], [end_value_y+.1 end_value_y+.1], 'FaceColor', 'green', 'FaceAlpha', 0.4)
+area([tData_FlightPhase(1) tData_FlightPhase(end)], [end_value_y+.1 end_value_y+.1], 'FaceColor', [255/255,205/255,0/255], 'FaceAlpha', 0.4)
 
 xlabel({'$t$ in [$s$]'}, 'Interpreter', 'latex') 
 ylabel({'$z^{CoM}$ and $z^{Foot}$ in [$m$]'}, 'Interpreter', 'latex') 
