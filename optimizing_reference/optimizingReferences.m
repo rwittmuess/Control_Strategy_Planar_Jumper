@@ -1,7 +1,6 @@
 function [  k11, k12, k13, k14,...
             k21, k22, k23,...
             k31, k32, k33,...
-            k41, k42, k43, k44,...
             zd_Fmax, tz_Fmax] = optimizingReferences(td_LO, dld_LO, zd_Fmax, tz_Fmax, tl_min, tl_end)
 %% defining constants
 g = 9.81;
@@ -22,7 +21,7 @@ plot(t,lref, 'LineWidth', 1.5);hold on; grid on;
 plot(t,dlref, 'LineWidth', 1.5); 
 % plot(t,ddlref);
 xlabel({'$t$ in [$s$]'}, 'Interpreter', 'latex') 
-ylabel({'$l$ in [$m$] and $\dot{l}_{ref}$ in [$\frac{m}{s}$]'}, 'Interpreter', 'latex') 
+ylabel({'$l_{ref}$ in [$m$] and $\dot{l}_{ref}$ in [$\frac{m}{s}$]'}, 'Interpreter', 'latex') 
 legend({'$l_{ref}$', '$\dot{l}_{ref}$'}, 'Interpreter', 'latex')
 title({'Ground Phase: $l_{ref}$ and $\dot{l}_{ref}$'}, 'Interpreter', 'latex')
 
@@ -66,9 +65,9 @@ plot(t_flight_ref,zF_flight_ref, 'LineWidth', 1.5);hold on; grid on;
 % plot(t,dlref, 'LineWidth', 1.5); 
 % plot(t,ddlref);
 xlabel({'$t$ in [$s$]'}, 'Interpreter', 'latex') 
-ylabel({'$z_{ref}^z$ in [$m$]'}, 'Interpreter', 'latex') 
-legend({'$z_{ref}^z$'}, 'Interpreter', 'latex')
-title({'Flight Phase: $z_{ref}^z$'}, 'Interpreter', 'latex')
+ylabel({'$z_{ref}^{Foot}$ in [$m$]'}, 'Interpreter', 'latex') 
+legend({'$z_{ref}^{Foot}$'}, 'Interpreter', 'latex')
+title({'Flight Phase: $z_{ref}^{Foot}$'}, 'Interpreter', 'latex')
 
 temp = gca;
 exportgraphics(temp,'./plots/FlightPhase_zFref.pdf','ContentType','vector')
@@ -96,25 +95,6 @@ title({'Landing Phase: $l_{ref}$ and $\dot{l}_{ref}$'}, 'Interpreter', 'latex')
 
 temp = gca;
 exportgraphics(temp,'./plots/LandingPhase_zFref.pdf','ContentType','vector')
-
-
-disp("vincent working on the following...")
-
-
-%% Optimizing: REJUMP
-ld_LO = k11 .* tanh(0) - 0.5*g*td_LO.^2 + k13*td_LO + k14;
-treJump = 1;
-
-[k41, k42, k43, k44] = optReJump(treJump,ld_LO, dld_LO, lF, dlF);
-
-t = 0:0.01:treJump;
-lreJump = k41 .* tanh(k42 * (t - treJump)) - 0.5*g*t.^2 + k43*t + k44;
-dlreJump = k41 * k42 .* sech(k42*(t-treJump)).^2 - g*t + k43;
-figure(4)
-hold on;
-grid on;
-plot(t,lreJump);
-plot(t,dlreJump);
 
 
 end

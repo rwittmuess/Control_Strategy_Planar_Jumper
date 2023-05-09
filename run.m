@@ -45,15 +45,13 @@ tl_end = 1; % time after which landing is finished (at as big as tl_min
 [   k11, k12, k13, k14,...
     k21, k22, k23,...
     k31, k32, k33,...
-    k41, k42, k43, k44,...
     zd_Fmax, tz_Fmax] = optimizingReferences(td_LO, dld_LO, zd_Fmax, tz_Fmax, tl_min, tl_end);
 
 
 %% Generate Dynamics
 dynamics(   k11, k12, k13, k14,...
             k21, k22, k23,...
-            k31, k32, k33,...
-            k41, k42, k43, k44);
+            k31, k32, k33);
 
 
 %% Run Simulation
@@ -113,7 +111,7 @@ dl_LO   = LOv(2);
 
 zFref   = zFref_gen([tData_FlightPhase';ones(1,length(tData_FlightPhase))*td_LO;ones(1,length(tData_FlightPhase))*tz_Fmax]);
 zFreal  = zCOM_kin_gen([tData_FlightPhase';ones(1,length(tData_FlightPhase))*td_LO;ones(1,length(tData_FlightPhase))*tz_Fmax;ones(1,length(tData_FlightPhase))*l_LO;ones(1,length(tData_FlightPhase))*dl_LO]) ...
-        - l_gen(sData_FlightPhase(:,1:3)');
+        - l_gen(sData_FlightPhase(:,1:5)');
 
 figure
 hold on;
@@ -121,12 +119,38 @@ grid on;
 plot(tData_FlightPhase,zFref, 'LineWidth', 3);hold on; grid on;
 plot(tData_FlightPhase,zFreal, 'LineWidth', 1.5);
 xlabel({'$t$ in [$s$]'}, 'Interpreter', 'latex') 
-ylabel({'$z_{ref}^F$ and $z_{real}^F$ in [$m$]'}, 'Interpreter', 'latex') 
-legend({'$z_{ref}^F$','$z_{real}^F$'}, 'Interpreter', 'latex')
-title({'Flight Phase: $z_{ref}^F$ and $z_{real}^F$'}, 'Interpreter', 'latex')
+ylabel({'$z_{ref}^{Foot}$ and $z_{real}^{Foot}$ in [$m$]'}, 'Interpreter', 'latex') 
+legend({'$z_{ref}^{Foot}$','$z_{real}^{Foot}$'}, 'Interpreter', 'latex')
+title({'Flight Phase: $z_{ref}^{Foot}$ and $z_{real}^{Foot}$'}, 'Interpreter', 'latex')
 
 temp = gca;
 exportgraphics(temp,'./plots/FlightPhase_zFref_zFreal.pdf','ContentType','vector')
+
+
+%%
+%zCOM & zF
+
+zCOM = zCOM_gen(sData');
+
+figure
+hold on;
+grid on;
+plot(tData,zCOM, 'LineWidth', 1.5); 
+plot(tData,sData(:,4), 'LineWidth', 1.5);
+end_value_x = floor(tData(end)) + ceil((tData(end)-floor(tData(end)))/0.25) * 0.25;
+end_value_y = floor(max(zCOM)) + ceil((max(zCOM)-floor(max(zCOM)))/0.25) * 0.25;
+axis([0 end_value 0 end_value_y])
+
+% highlight the area between beginning and end of the flight phase
+area([tData_FlightPhase(1) tData_FlightPhase(end)], [end_value_y+.1 end_value_y+.1], 'FaceColor', 'green', 'FaceAlpha', 0.4)
+
+xlabel({'$t$ in [$s$]'}, 'Interpreter', 'latex') 
+ylabel({'$z^{CoM}$ and $z^{Foot}$ in [$m$]'}, 'Interpreter', 'latex') 
+legend({'$z^{CoM}$','$z^{Foot}$','Flight Phase'}, 'Interpreter', 'latex')
+title({'Entire Jump Process $z^{CoM}$ and $z^{Foot}$'}, 'Interpreter', 'latex')
+
+temp = gca;
+exportgraphics(temp,'./plots/EntireJump_zCoM_zFoot.pdf','ContentType','vector')
 
 
 %%

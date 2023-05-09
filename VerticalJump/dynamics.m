@@ -75,6 +75,7 @@ matlabFunction(pHead, 'File', 'gen/pHead_gen', 'Vars', {q});
 matlabFunction(pCOM,  'File', 'gen/pCOM_gen',  'Vars', {q});
 matlabFunction(dxCOM, 'File', 'gen/dxCOM_gen', 'Vars', {s});
 matlabFunction(dzCOM, 'File', 'gen/dzCOM_gen', 'Vars', {s});
+matlabFunction(zCOM, 'File', 'gen/zCOM_gen', 'Vars', {q});
 
 dp1 = simplify(jacobian(p1, q)*dq);
 dp2 = simplify(jacobian(p2, q)*dq);
@@ -102,8 +103,8 @@ qActuated = [q1;q2;q3];
 [D, Cq, G, B] = LagrangianDynamics(KE, PE, q, dq, qActuated);
 
 % calculating inverse to reduce runtime later
-D_inv = simplify(D\eye(5));
-D33_inv = simplify(D(1:3,1:3)\eye(3));
+% D_inv = simplify(D\eye(5));
+% D33_inv = simplify(D(1:3,1:3)\eye(3));
 
 % fun_D = matlabFunction(D);
 % fun_Cq = matlabFunction(Cq);
@@ -112,8 +113,8 @@ D33_inv = simplify(D(1:3,1:3)\eye(3));
 matlabFunction(D,  'File', 'gen/D_gen',   'Vars', {s});
 matlabFunction(Cq, 'File', 'gen/Cq_gen',  'Vars', {s});
 matlabFunction(G,  'File', 'gen/G_gen',   'Vars', {s});
-matlabFunction(D_inv, 'File', 'gen/D_inv_gen',  'Vars', {s});
-matlabFunction(D33_inv,  'File', 'gen/D33_inv_gen',   'Vars', {s});
+% matlabFunction(D_inv, 'File', 'gen/D_inv_gen',  'Vars', {s});
+% matlabFunction(D33_inv,  'File', 'gen/D33_inv_gen',   'Vars', {s});
 
 l = simplify(sqrt((pCOM(1)-xF)^2 + (pCOM(2)-zF)^2));
 theta = simplify(atan((pCOM(1)-xF)/(pCOM(2)-zF)));
