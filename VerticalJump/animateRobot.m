@@ -15,7 +15,7 @@ function animateRobot(tData, qData)
             pause(tData(i+1) - tData(i));
         end
         % To save the animation as a GIF:
-        % exportgraphics(gcf,'animation_jump.gif','Append',true);
+        exportgraphics(gcf,'plots/animation_jump.gif','Append',true);
     end
 end
 

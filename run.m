@@ -1,14 +1,6 @@
 %% Legged Robots - Final Project
 %{
-    ToDo:
-    * make event function dependend on l'' < -g for lift-off
-    * plot desired path and actual path to make sure robot follows desired path
-    * 
-    * calculate K_i's for desired height/speed/time,...
-
-    * take desired tz_min and other values into the dynamics to generate ts
-    * and tss
-
+    Project finished: 2023 | 05 | 09 
 %}
 
 
@@ -30,15 +22,12 @@ td_LO = 1; % time of lift-off (min = 0.1, max = 1)
 dld_LO = 0.8; % speed of CoM at lift-off (max = 0.9, min = 0.1)
 
 % Flight settings
-zd_Fmax = 0.5; % max foot hight in the air (min max depends on jump-off, see below)
+zd_Fmax = 0.4; % max foot hight in the air (min max depends on jump-off, see below)
 tz_Fmax = 0.2; % time after which max foot hight is reached, half of flight time
 
 % Landing settings
 tl_min = 0.2; % time after which lowest COM is reached
 tl_end = 1; % time after which landing is finished (at as big as tl_min
-
-% Re-jump settings
-% t_rejump = 1; % time between landing and jump-off
 
 
 %% Optimizing Values
@@ -76,11 +65,12 @@ figure
 hold on;
 grid on;
 plot(tData_GroundPhase,lref_LO, 'LineWidth', 1.5);hold on; grid on;
-plot(tData_GroundPhase,l, 'LineWidth', 1.5); 
+plot(tData_GroundPhase,l, '--','LineWidth', 1.5); 
 xlabel({'$t$ in [$s$]'}, 'Interpreter', 'latex') 
 ylabel({'$l$ in [$m$]'}, 'Interpreter', 'latex') 
 legend({'$l_{ref}$', '$l_{real}$'}, 'Interpreter', 'latex')
 title({'Ground Phase: $l_{ref}$ and $l_{real}$'}, 'Interpreter', 'latex')
+axis([tData_GroundPhase(1) tData_GroundPhase(end) 0 0.8])
 
 temp = gca;
 exportgraphics(temp,'./plots/GroundPhase_lref_l.pdf','ContentType','vector')
@@ -127,7 +117,32 @@ temp = gca;
 exportgraphics(temp,'./plots/FlightPhase_zFref_zFreal.pdf','ContentType','vector')
 
 
-%%
+%% LANDING PHASE
+% lref vs lreal
+
+l = l_gen(sData_LandingPhase(:,1:5)')';
+tLI = tData_FlightPhase(end); 
+lref_LI = lref_LI_gen([tData_LandingPhase';ones(1,length(tData_LandingPhase))*tLI;ones(1,length(tData_LandingPhase))*tl_min;]);
+
+
+figure
+hold on;
+grid on;
+plot(tData_LandingPhase,lref_LI, 'LineWidth', 1.5);hold on; grid on;
+plot(tData_LandingPhase,l,'--', 'LineWidth', 1.5);
+xlabel({'$t$ in [$s$]'}, 'Interpreter', 'latex') 
+ylabel({'$l_{ref}$ and $l_{real}$ in [$m$]'}, 'Interpreter', 'latex') 
+%end_value_x = floor(tData(end)) + ceil((tData(end)-floor(tData(end)))/0.25) * 0.25;
+%end_value_y = floor(max(zCOM)) + ceil((max(zCOM)-floor(max(zCOM)))/0.25) * 0.25;
+axis([tData_LandingPhase(1) tData_LandingPhase(end) 0 0.8])
+legend({'$l_{ref}$','$l_{real}$'}, 'Interpreter', 'latex')
+title({'Landing Phase: $l_{ref}$ and $l_{real}$'}, 'Interpreter', 'latex')
+
+temp = gca;
+exportgraphics(temp,'./plots/LandingPhase_lref_lreal.pdf','ContentType','vector')
+
+
+%% Whole Jump
 %zCOM & zF
 
 zCOM = zCOM_gen(sData');
@@ -152,70 +167,3 @@ title({'Entire Jump Process $z^{CoM}$ and $z^{Foot}$'}, 'Interpreter', 'latex')
 temp = gca;
 exportgraphics(temp,'./plots/EntireJump_zCoM_zFoot.pdf','ContentType','vector')
 
-
-%%
-% t1s_val = [tData';ones(length(tData)*1)];
-% lref_F = lref_F_gen(t1s_val,sData);
-% lref_F = [zeros(1,101),lref_F]';
-% zFref = zFref_gen(t1s_val);
-%% 
-% 
-% ds2 = [sData, ds(6:end,:)'];
-% 
-% ddl = ddl_gen(ds2')';
-% 
-% ddl = diff(dl)/(tData(2)-tData(1));
-
-%%
-% tF = tData(101:end);
-% t1s_val = [tF';ones(1,length(tF))*1];
-% %%
-% zFref = zFref_gen(t1s_val);
-% figure(3)
-% hold on;
-% grid on;
-% plot(tF,zFref);
-% plot(tF,sData(101:end,4));
-% legend(["zF_{ref}","zF_{real}"]);
-% 
-% %%
-% % lref_F = lref_F_gen([tF';ones(1,length(tF))*1;ones(1,length(tF))*LOv(1);ones(1,length(tF))*LOv(2)]);
-% zCOM_kin = zCOM_kin_gen([tF';ones(1,length(tF))*1;ones(1,length(tF))*LOv(1);ones(1,length(tF))*LOv(2)]);
-% zFref = zFref_gen([tF';ones(1,length(tF))*1]);
-% pCOM = pCOM_gen(sData(101:end,1:5)');
-% zCOM = pCOM(2,:);
-% 
-% lref_F = zCOM - zFref;
-% 
-% figure(4)
-% hold on;
-% grid on;
-% plot(tF,lref_F);
-% plot(tF,zCOM_kin);
-% plot(tF,zFref);
-% % plot(tF,sData(102:end,4));
-% plot(tF,zCOM);
-% plot(tF,l(101:end));
-% 
-% legend(["lref_F", "zCOM_{kin}", "zF_{ref}", "zCOM_{real}","l_{real}"]);
-% % plot(tF,sData(102:end,4));
-% 
-% 
-% dzCOM_kin = dzCOM_kin_gen([tF';ones(1,length(tF))*1;ones(1,length(tF))*LOv(1);ones(1,length(tF))*LOv(2)]);
-% dzCOM = dzCOM_gen(sData(101:end,:)');
-% 
-% 
-% figure(5)
-% hold on;
-% grid on;
-% plot(tF,dzCOM_kin);
-% plot(tF,dzCOM);
-% legend(["dzCOM_{kin}", "dzCOM_{real}"])
-% 
-% tTest = 1:0.01:1.5;
-% zFref = zFref_gen([tTest;ones(1,length(tTest))*1]);
-% 
-% figure(6)
-% hold on;
-% grid on;
-% plot(tTest,zFref);
