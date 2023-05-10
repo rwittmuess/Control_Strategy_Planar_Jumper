@@ -28,6 +28,5 @@ plot(t,lref_LOv);
 hold on;
 grid on;
 plot(t,dlref_LOv);
-%plot(t,ddlref_LOv);
 legend(["position", "velocity", "acceleration"]);
 

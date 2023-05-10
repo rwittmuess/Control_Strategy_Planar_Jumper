@@ -15,7 +15,7 @@ function animateRobot(tData, qData)
             pause(tData(i+1) - tData(i));
         end
         % To save the animation as a GIF:
-        exportgraphics(gcf,'plots/animation_jump.gif','Append',true);
+        % exportgraphics(gcf,'plots/animation_jump.gif','Append',true);
     end
 end
 
@@ -58,12 +58,6 @@ function drawFloor
         line([i*stripe_width, i*stripe_width-0.1], [0, -0.1], 'Color', 'k', 'LineWidth', 1);
     end
     
-    % % Set the axis limits
-    % xlim([0 num_stripes*stripe_width]);
-    % ylim([-1 0]);
-    % 
-    % % Set the aspect ratio to equal
-    % daspect([1 1 1]);
     line([-1, 1], [0;0], 'Color', 'k', 'LineWidth', 1);
 
 end

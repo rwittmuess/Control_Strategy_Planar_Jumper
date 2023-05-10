@@ -3,17 +3,9 @@ function [c,ceq] = landingNonl(k,tl_min,tl_end,lF,dlF)
     k32 = k(2);
     k33 = k(3);
     g = 9.81;
-    
-    % lref_LI = -k31*1/(cosh(k32*(t - tl_min))^2)-k33
-    % lref_LI' = 2*k31*k32*tanh(k32*(t-tl_min))*sech(k32*(t-tl_min))
-    
-    %%% equality constraints c(k) = 0 %%%
-    % lref_LI(0) = lF
+
     eq1 = -k31*1/(cosh(k32*(0 - tl_min))^2)-k33 - lF;
-    % lref_LI'(0) = dlF
     eq2 = k31*2*k32*sinh(k32*(0-tl_min))*cosh(k32*(0-tl_min))*k32 - dlF;
-    % lref_LI'(tl_end) = 0
-%     eq3 = 2*k31*k32*tanh(k32*(tl_end-tl_min))*sech(k32*(tl_end-tl_min));
 
     ceq = [eq1; eq2];
 

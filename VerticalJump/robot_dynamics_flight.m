@@ -11,9 +11,7 @@ function ds = robot_dynamics_flight(t,s,LOv,td_LO,tz_Fmax)
     % control parameter
     M1 = 100;%300
     M2 = 100;
-
-%     td_LO = 1; % time of lift-off; later take actually lift-off time, if I can manage to make lift off event depended on acceleraion for instance
-
+    
 
     %% D
     D = D_gen(s);  

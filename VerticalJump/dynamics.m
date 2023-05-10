@@ -102,19 +102,9 @@ qActuated = [q1;q2;q3];
 
 [D, Cq, G, B] = LagrangianDynamics(KE, PE, q, dq, qActuated);
 
-% calculating inverse to reduce runtime later
-% D_inv = simplify(D\eye(5));
-% D33_inv = simplify(D(1:3,1:3)\eye(3));
-
-% fun_D = matlabFunction(D);
-% fun_Cq = matlabFunction(Cq);
-% fun_G = matlabFunction(G);
-
 matlabFunction(D,  'File', 'gen/D_gen',   'Vars', {s});
 matlabFunction(Cq, 'File', 'gen/Cq_gen',  'Vars', {s});
 matlabFunction(G,  'File', 'gen/G_gen',   'Vars', {s});
-% matlabFunction(D_inv, 'File', 'gen/D_inv_gen',  'Vars', {s});
-% matlabFunction(D33_inv,  'File', 'gen/D33_inv_gen',   'Vars', {s});
 
 l = simplify(sqrt((pCOM(1)-xF)^2 + (pCOM(2)-zF)^2));
 theta = simplify(atan((pCOM(1)-xF)/(pCOM(2)-zF)));
@@ -123,13 +113,6 @@ theta3 = q1+q2+q3;
 dl = simplify(jacobian(l, q)*dq); % not sure about this
 dtheta = simplify(jacobian(theta, q)*dq); % not sure about this
 dtheta3 = simplify(jacobian(theta3, q)*dq); % not sure about this
-
-% % time derivartive of the jacobian
-% J = jacobian(l,q);
-% dJ = simplify(jacobian(J*dq,q));
-% ddl = simplify(J * ddq + dJ*dq);
-% 
-% sq = [q;dq;ddq];
 
 qq = [q1;q2;q3];
 
@@ -169,29 +152,6 @@ LO = [l_LO;dl_LO];
 
 t1sLO = [t1s;LO];
 
-% parameter take-off trajectory
-% k11 = 6.32;
-% k12 = 1.8;
-% k13 = -1.17;
-% k14 = 6.67;
-
-% parameter flight trajectory
-% k21 = 0.13;
-% k22 = 25;
-% k23 = 0.01;
-
-% parameter landing trajectory
-% k31 = 0.169241108569274; %0.1;
-% k32 = 2;
-% k33 = -0.686209256691246; %0.58;
-
-% % desired parameters
-% td_LO = 1; % time of lift-off
-% zd_Fmax = 0.12; % max foot hight in ther air
-% dld_LO = 0.4; % speed of CoM at lift-off
-% tz_Fmax = 0.075; % time after which max foot hight is reached
-% tl_min = 0.2; % something for landing instance, I think the time after which l / hence COM will have its lowest value
-
 % reference during stance phase of the CoM
 lref_LO = simplify(k11 * tanh(k12 * (ts - td_LO)) - 0.5*g*ts^2 + k13*ts + k14);
 dlref_LO = simplify(diff(lref_LO,ts));
@@ -214,7 +174,6 @@ dlref_F = dzCOM_kin - dzFref;
 % reference during landing phase
 lref_LI = simplify(-k31*1/(cosh(k32*(t2star - tl_min))^2)-k33);
 dlref_LI = simplify(diff(lref_LI,ts));
-
 
 if ~exist('./gen')
     mkdir('./gen')

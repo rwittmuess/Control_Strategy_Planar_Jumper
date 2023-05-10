@@ -143,7 +143,7 @@ exportgraphics(temp,'./plots/LandingPhase_lref_lreal.pdf','ContentType','vector'
 
 
 %% Whole Jump
-%zCOM & zF
+% zCOM & zFoot
 
 zCOM = zCOM_gen(sData');
 

@@ -42,8 +42,6 @@ dzFref = simplify(diff(zFref,ts));
 
 pCOM_gen
 
-% lref_F = 
-
 % reference druing land phase
 lref_LI = simplify(-k31*1/(cosh(k32*(t2star - tl_min))^2)-k33);
 dlref_LI = simplify(diff(lref_LI,ts));
